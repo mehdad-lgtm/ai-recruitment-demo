@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
@@ -22,37 +23,39 @@ export function StatCard({
   className,
 }: StatCardProps) {
   return (
-    <div
+    <motion.div
+      whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)" }}
+      transition={{ duration: 0.2 }}
       className={cn(
-        "bg-card rounded-xl border border-(--color-border) p-6 shadow-sm hover:shadow-md transition-shadow",
+        "bg-card/70 backdrop-blur-md rounded-2xl border border-border/50 p-6 shadow-sm transition-all duration-300",
         className
       )}
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-3xl font-bold text-foreground mt-2">{value}</p>
+          <p className="text-sm font-medium text-muted-foreground tracking-wide uppercase text-[10px]">{title}</p>
+          <p className="text-3xl font-extrabold text-foreground mt-2 tracking-tight">{value}</p>
           {description && (
-            <p className="text-sm text-muted-foreground mt-1">{description}</p>
+            <p className="text-xs text-muted-foreground mt-1 font-medium">{description}</p>
           )}
           {trend && (
-            <div className="flex items-center gap-1 mt-2">
+            <div className="flex items-center gap-1.5 mt-3 px-2 py-1 rounded-full bg-muted/50 w-fit">
               <span
                 className={cn(
-                  "text-sm font-medium",
-                  trend.isPositive ? "text-green-600" : "text-red-600"
+                  "text-xs font-bold",
+                  trend.isPositive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
                 )}
               >
                 {trend.isPositive ? "+" : "-"}{Math.abs(trend.value)}%
               </span>
-              <span className="text-xs text-muted-foreground">vs last month</span>
+              <span className="text-[10px] text-muted-foreground uppercase font-semibold">vs last month</span>
             </div>
           )}
         </div>
-        <div className="p-3 rounded-lg bg-primary/10">
+        <div className="p-3.5 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/10 shadow-inner">
           <Icon className="h-6 w-6 text-primary" />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

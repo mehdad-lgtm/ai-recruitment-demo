@@ -1,27 +1,28 @@
 "use client";
 
 import {
-    Button,
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-    Input,
-    Label,
-    LoadingSpinner,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+  LoadingSpinner,
 } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
+import { motion } from "framer-motion";
 import {
-    ArrowRight,
-    Check,
-    Eye,
-    EyeOff,
-    Lock,
-    Mail,
-    Sparkles,
-    User,
+  ArrowRight,
+  Check,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  Sparkles,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -47,7 +48,8 @@ export default function SignUpPage() {
   ];
 
   const allRequirementsMet = passwordRequirements.every((req) => req.met);
-  const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
+  const passwordsMatch =
+    password === confirmPassword && confirmPassword.length > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,266 +92,210 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex text-foreground font-sans">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-linear-to-br from-(--color-chart-4) via-primary/90 to-primary relative overflow-hidden">
-        {/* Decorative Elements */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-32 right-20 w-72 h-72 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-20 w-96 h-96 bg-white rounded-full blur-3xl" />
-          <div className="absolute top-1/3 right-1/3 w-48 h-48 bg-white rounded-full blur-2xl" />
-        </div>
+      <div className="hidden lg:flex w-1/2 bg-slate-900 relative overflow-hidden items-center justify-center">
+        {/* Abstract shapes & Gradient */}
+        <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-slate-900 via-purple-900/20 to-black" />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-blue-500/10 blur-3xl animate-[pulse_5s_ease-in-out_infinite]" />
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full bg-indigo-600/10 blur-3xl" />
 
-        {/* Animated Circles */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-4 -right-4 w-24 h-24 border border-white/20 rounded-full animate-[pulse_4s_ease-in-out_infinite]" />
-          <div className="absolute top-1/4 right-1/4 w-32 h-32 border border-white/10 rounded-full animate-[pulse_6s_ease-in-out_infinite]" />
-          <div className="absolute bottom-1/4 left-1/4 w-40 h-40 border border-white/15 rounded-full animate-[pulse_5s_ease-in-out_infinite]" />
-        </div>
-
-        <div className="relative z-10 flex flex-col justify-center items-center w-full p-12 text-white">
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                <Sparkles className="h-10 w-10" />
-              </div>
-              <span className="text-3xl font-bold tracking-tight">Salesworks</span>
+        <div className="relative z-10 max-w-xl px-12 text-center text-white space-y-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <div className="inline-flex items-center justify-center p-3 bg-white/10 backdrop-blur-xl rounded-2xl mb-8 border border-white/10 shadow-2xl">
+              <Sparkles className="w-10 h-10 text-primary-foreground" />
             </div>
-          </div>
-
-          <h1 className="text-5xl font-bold text-center mb-6 leading-tight">
-            Join the Future
-            <br />
-            of Hiring
-          </h1>
-
-          <p className="text-xl text-white/80 text-center max-w-md mb-12">
-            Create your account and start transforming your recruitment process
-            with AI-powered intelligence.
-          </p>
-
-          <div className="space-y-4 max-w-sm">
-            {[
-              "Intelligent candidate screening",
-              "Automated interview scheduling",
-              "WhatsApp & voice integration",
-              "Real-time analytics dashboard",
-            ].map((feature, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg p-3"
-              >
-                <div className="shrink-0 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                  <Check className="h-4 w-4" />
-                </div>
-                <span className="text-white/90">{feature}</span>
-              </div>
-            ))}
-          </div>
+            <h1 className="text-5xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-indigo-200">
+              Join the Future
+            </h1>
+            <p className="text-xl text-slate-300 leading-relaxed font-light">
+              Create an account to start leveraging AI for your recruitment pipeline.
+            </p>
+          </motion.div>
         </div>
       </div>
 
-      {/* Right Side - Signup Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-background overflow-y-auto">
-        <div className="w-full max-w-md my-8">
-          {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center justify-center gap-2 mb-8">
-            <div className="p-2 bg-primary rounded-lg">
-              <Sparkles className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-foreground">Salesworks</span>
+      {/* Right Side - Form */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 relative bg-background overflow-y-auto">
+        <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="w-full max-w-md space-y-8 py-8"
+        >
+          <div className="space-y-2 text-center lg:text-left">
+            <h2 className="text-3xl font-bold tracking-tight">Create Account</h2>
+            <p className="text-muted-foreground">
+              Enter your details to get started
+            </p>
           </div>
 
-          <Card className="border-0 shadow-2xl shadow-primary/5 bg-card">
-            <CardHeader className="space-y-1 pb-4">
-              <CardTitle className="text-2xl font-bold tracking-tight">Create an account</CardTitle>
-              <CardDescription className="text-muted-foreground">
-                Fill in your details to get started
+          <Card className="border-border/50 shadow-xl bg-card/50 backdrop-blur-xl">
+            <CardHeader>
+              <CardTitle className="text-xl">Sign Up</CardTitle>
+              <CardDescription>
+                It takes less than a minute.
               </CardDescription>
             </CardHeader>
-
-            <form onSubmit={handleSubmit}>
-              <CardContent className="space-y-4">
-                {error && (
-                  <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm font-medium animate-in fade-in slide-in-from-top-1">
-                    {error}
-                  </div>
-                )}
-
+            <CardContent className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-medium">
-                    Full Name
-                  </Label>
+                  <Label htmlFor="name">Full Name</Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="name"
                       type="text"
                       placeholder="John Doe"
-                      className="pl-10 h-11"
+                      className="pl-9 bg-background/50 backdrop-blur-sm"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
-                      autoComplete="name"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium">
-                    Email Address
-                  </Label>
+                  <Label htmlFor="email">Email</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="email"
                       type="email"
-                      placeholder="you@example.com"
-                      className="pl-10 h-11"
+                      placeholder="name@example.com"
+                      className="pl-9 bg-background/50 backdrop-blur-sm"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      autoComplete="email"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium">
-                    Password
-                  </Label>
+                  <Label htmlFor="password">Password</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Create a strong password"
-                      className="pl-10 pr-10 h-11"
+                      placeholder="At least 8 chars"
+                      className="pl-9 pr-9 bg-background/50 backdrop-blur-sm"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      autoComplete="new-password"
                     />
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4 w-4 text-muted-foreground" />
                       )}
-                    </button>
+                    </Button>
                   </div>
-
-                  {/* Password Requirements */}
-                  {password.length > 0 && (
-                    <div className="grid grid-cols-2 gap-1 mt-2">
-                      {passwordRequirements.map((req, index) => (
-                        <div
-                          key={index}
-                          className={`flex items-center gap-1.5 text-xs transition-colors ${
-                            req.met
-                              ? "text-green-600 dark:text-green-400"
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          <div
-                            className={`w-3 h-3 rounded-full flex items-center justify-center ${
-                              req.met
-                                ? "bg-green-500"
-                                : "bg-muted"
-                            }`}
-                          >
-                            {req.met && <Check className="h-2 w-2 text-white" />}
-                          </div>
-                          {req.label}
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium">
-                    Confirm Password
-                  </Label>
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
-                      className={`pl-10 pr-10 h-11 ${
-                        confirmPassword.length > 0
-                          ? passwordsMatch
-                            ? "border-green-500 focus:ring-green-500"
-                            : "border-destructive focus:ring-destructive"
-                          : ""
+                      placeholder="Confirm password"
+                      className={`pl-9 pr-9 bg-background/50 backdrop-blur-sm ${
+                        confirmPassword.length > 0 && !passwordsMatch ? "border-red-500" : ""
                       }`}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      autoComplete="new-password"
                     />
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4" />
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4 w-4 text-muted-foreground" />
                       )}
-                    </button>
+                    </Button>
                   </div>
-                  {confirmPassword.length > 0 && !passwordsMatch && (
-                    <p className="text-xs text-destructive">
-                      Passwords do not match
-                    </p>
-                  )}
                 </div>
 
-                <div className="flex items-start gap-2">
-                  <input
+                {/* Password Requirements */}
+                <div className="space-y-2 rounded-lg bg-muted/50 p-3 text-xs">
+                  <p className="font-medium text-muted-foreground mb-2">Password must have:</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {passwordRequirements.map((req, index) => (
+                      <div
+                        key={index}
+                        className={`flex items-center space-x-2 ${
+                          req.met ? "text-green-600" : "text-muted-foreground"
+                        }`}
+                      >
+                        <div
+                          className={`flex h-4 w-4 items-center justify-center rounded-full border ${
+                            req.met
+                              ? "border-green-600 bg-green-100 dark:bg-green-900/20"
+                              : "border-muted-foreground"
+                          }`}
+                        >
+                          {req.met && <Check className="h-2.5 w-2.5" />}
+                        </div>
+                        <span>{req.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                   <input
                     type="checkbox"
                     id="terms"
+                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                     checked={acceptTerms}
                     onChange={(e) => setAcceptTerms(e.target.checked)}
-                    className="h-4 w-4 mt-0.5 rounded border-(--color-border) text-primary focus:ring-(--color-ring)"
                   />
-                  <Label
+                  <label
                     htmlFor="terms"
-                    className="text-sm text-muted-foreground cursor-pointer leading-tight"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    I agree to the{" "}
+                    I accept the{" "}
                     <Link
                       href="/terms"
-                      className="text-primary hover:underline"
+                      className="text-primary hover:underline hover:text-primary/90"
                     >
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link
-                      href="/privacy"
-                      className="text-primary hover:underline"
-                    >
-                      Privacy Policy
+                      terms and conditions
                     </Link>
-                  </Label>
+                  </label>
                 </div>
-              </CardContent>
 
-              <CardFooter className="flex flex-col gap-4">
-                <Button
-                  type="submit"
-                  className="w-full h-11 text-base font-semibold"
-                  disabled={isLoading || !allRequirementsMet || !passwordsMatch || !acceptTerms}
+                {error && (
+                  <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md animate-fade-in">
+                    {error}
+                  </div>
+                )}
+
+                <Button 
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-primary/25 transition-all duration-300" 
+                    type="submit" 
+                    disabled={isLoading || !allRequirementsMet || !passwordsMatch || !acceptTerms}
                 >
                   {isLoading ? (
-                    <LoadingSpinner size="sm" className="text-white" />
+                    <LoadingSpinner className="mr-2" size="sm" />
                   ) : (
                     <>
                       Create Account
@@ -357,31 +303,21 @@ export default function SignUpPage() {
                     </>
                   )}
                 </Button>
-
-                <div className="relative w-full">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-(--color-border)" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">
-                      Or
-                    </span>
-                  </div>
-                </div>
-
-                <p className="text-sm text-center text-muted-foreground">
-                  Already have an account?{" "}
-                  <Link
-                    href="/auth/login"
-                    className="text-primary hover:text-primary/80 font-semibold transition-colors"
-                  >
-                    Sign in
-                  </Link>
-                </p>
-              </CardFooter>
-            </form>
+              </form>
+            </CardContent>
+            <CardFooter className="flex justify-center">
+              <p className="text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link
+                  href="/auth/login"
+                  className="text-primary font-medium hover:underline"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </CardFooter>
           </Card>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
