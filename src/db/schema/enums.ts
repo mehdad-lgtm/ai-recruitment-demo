@@ -11,6 +11,43 @@ export const userRoleEnum = pgEnum("user_role", [
 ]);
 
 // ================================================
+// KNOWLEDGE BASE ENUMS
+// ================================================
+
+export const knowledgeTypeEnum = pgEnum("knowledge_type", [
+  "faq",                    // Frequently Asked Questions
+  "objection_handling",     // Scripts for handling objections
+  "communication_template", // Message/call templates
+  "best_practice",          // Best practices and guidelines
+  "process_guide",          // Step-by-step process guides
+  "candidate_insight",      // Insights about specific candidates
+  "industry_knowledge",     // Industry-specific information
+  "company_policy",         // Company policies and rules
+  "ai_prompt",              // AI system prompts
+  "troubleshooting",        // Problem-solving guides
+]);
+
+export const knowledgeCategoryEnum = pgEnum("knowledge_category", [
+  "recruitment",      // General recruitment knowledge
+  "screening",        // Candidate screening
+  "scheduling",       // Interview scheduling
+  "communication",    // Communication tactics
+  "negotiation",      // Salary and offer negotiation
+  "onboarding",       // Candidate onboarding
+  "compliance",       // Legal and compliance
+  "technology",       // System and tech knowledge
+  "general",          // General knowledge
+]);
+
+export const knowledgeStatusEnum = pgEnum("knowledge_status", [
+  "draft",           // Being created/edited
+  "review",          // Under review
+  "published",       // Active and available
+  "archived",        // No longer active but kept for reference
+  "deprecated",      // Outdated, should not be used
+]);
+
+// ================================================
 // CANDIDATE ENUMS
 // ================================================
 

@@ -23,6 +23,9 @@ export * from "./events";
 // AI & Training
 export * from "./ai";
 
+// Knowledge Base
+export * from "./knowledge";
+
 // QR Codes & Deep Links
 export * from "./qr";
 

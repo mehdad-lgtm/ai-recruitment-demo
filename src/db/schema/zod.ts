@@ -12,12 +12,12 @@ import { communicationAttempts, emails, voiceCalls, whatsappMessages } from "./c
 
 // Scheduling
 import {
-    interviewAssignments,
-    interviewerAvailability,
-    interviewerBlockedTimes,
-    interviewSessions,
-    schedulingHistory,
-    standardTimeSlots
+  interviewAssignments,
+  interviewerAvailability,
+  interviewerBlockedTimes,
+  interviewSessions,
+  schedulingHistory,
+  standardTimeSlots
 } from "./scheduling";
 
 // Events
@@ -25,16 +25,25 @@ import { auditLogs, calendarChangeEvents, notifications, systemEvents, timelineE
 
 // AI
 import {
-    aiInteractionLogs,
-    aiPromptTemplates,
-    aiTrainingCallRecordings,
-    aiTrainingWhatsappChats,
-    cvParsingResults,
-    jobCriteria
+  aiInteractionLogs,
+  aiPromptTemplates,
+  aiTrainingCallRecordings,
+  aiTrainingWhatsappChats,
+  cvParsingResults,
+  jobCriteria
 } from "./ai";
 
 // QR
 import { qrCodes, qrScans, whatsappDeepLinks } from "./qr";
+
+// Knowledge Base
+import {
+  knowledgeAttachments,
+  knowledgeBase,
+  knowledgeFeedback,
+  knowledgeRelations,
+  knowledgeUsageLog,
+} from "./knowledge";
 
 // ================================================
 // USER SCHEMAS
@@ -284,3 +293,32 @@ export const insertWhatsappDeepLinkSchema = createInsertSchema(whatsappDeepLinks
 export const selectWhatsappDeepLinkSchema = createSelectSchema(whatsappDeepLinks);
 export type InsertWhatsappDeepLink = InferInsertModel<typeof whatsappDeepLinks>;
 export type SelectWhatsappDeepLink = InferSelectModel<typeof whatsappDeepLinks>;
+
+// ================================================
+// KNOWLEDGE BASE SCHEMAS
+// ================================================
+
+export const insertKnowledgeBaseSchema = createInsertSchema(knowledgeBase);
+export const selectKnowledgeBaseSchema = createSelectSchema(knowledgeBase);
+export type InsertKnowledgeBase = InferInsertModel<typeof knowledgeBase>;
+export type SelectKnowledgeBase = InferSelectModel<typeof knowledgeBase>;
+
+export const insertKnowledgeRelationsSchema = createInsertSchema(knowledgeRelations);
+export const selectKnowledgeRelationsSchema = createSelectSchema(knowledgeRelations);
+export type InsertKnowledgeRelations = InferInsertModel<typeof knowledgeRelations>;
+export type SelectKnowledgeRelations = InferSelectModel<typeof knowledgeRelations>;
+
+export const insertKnowledgeUsageLogSchema = createInsertSchema(knowledgeUsageLog);
+export const selectKnowledgeUsageLogSchema = createSelectSchema(knowledgeUsageLog);
+export type InsertKnowledgeUsageLog = InferInsertModel<typeof knowledgeUsageLog>;
+export type SelectKnowledgeUsageLog = InferSelectModel<typeof knowledgeUsageLog>;
+
+export const insertKnowledgeAttachmentsSchema = createInsertSchema(knowledgeAttachments);
+export const selectKnowledgeAttachmentsSchema = createSelectSchema(knowledgeAttachments);
+export type InsertKnowledgeAttachments = InferInsertModel<typeof knowledgeAttachments>;
+export type SelectKnowledgeAttachments = InferSelectModel<typeof knowledgeAttachments>;
+
+export const insertKnowledgeFeedbackSchema = createInsertSchema(knowledgeFeedback);
+export const selectKnowledgeFeedbackSchema = createSelectSchema(knowledgeFeedback);
+export type InsertKnowledgeFeedback = InferInsertModel<typeof knowledgeFeedback>;
+export type SelectKnowledgeFeedback = InferSelectModel<typeof knowledgeFeedback>;
