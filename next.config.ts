@@ -23,21 +23,6 @@ const nextConfig: NextConfig = {
         hostname: "**.supabase.co",
       },
     ],
-    // Cloudflare Pages handles images efficiently
-    unoptimized: false,
-  },
-
-  // Cloudflare optimizations
-  swcMinify: true,
-  compress: true,
-  
-  // Static generation timeout
-  staticPageGenerationTimeout: 120,
-  
-  // Optimize for edge deployment
-  onDemandEntries: {
-    maxInactiveAge: 25 * 60 * 1000,
-    pagesBufferLength: 5,
   },
 };
 
