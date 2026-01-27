@@ -17,7 +17,9 @@
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "deploy:cloudflare": "npm run build && wrangler deploy",
+    "deploy:preview": "wrangler pages dev .next"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
