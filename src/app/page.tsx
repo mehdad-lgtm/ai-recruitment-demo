@@ -15,9 +15,9 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
 import { ArrowRight, Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,14 +33,20 @@ export default function LoginPage() {
     setError(null);
 
     try {
+      const toastId = toast.loading("Signing in...");
+
       const result = await authClient.signIn.email({
         email,
         password,
       });
 
       if (result.error) {
-        setError(result.error.message || "Invalid credentials");
+        const errorMsg = result.error.message || "Invalid credentials";
+        setError(errorMsg);
+        toast.error(errorMsg, { id: toastId });
       } else {
+        toast.success("Welcome back! Redirecting...", { id: toastId });
+        
         // Get user session to determine role-based redirect
         const session = await authClient.getSession();
         const userRole = (session.data?.user as { role?: string })?.role || "recruiter";
@@ -53,8 +59,10 @@ export default function LoginPage() {
         };
         router.push(roleHome[userRole] || "/recruiter");
       }
-    } catch {
-      setError("An unexpected error occurred. Please try again.");
+    } catch (error) {
+      const errorMsg = "An unexpected error occurred. Please try again.";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -84,22 +92,6 @@ export default function LoginPage() {
               <p className="text-xl text-slate-300 leading-relaxed font-light">
                 Join thousands of companies using AI to streamline their hiring process and find the perfect candidates.
               </p>
-           </motion.div>
-           
-           <motion.div
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             transition={{ delay: 0.5, duration: 1 }}
-             className="grid grid-cols-2 gap-4 pt-12"
-           >
-              <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/5 hover:bg-white/10 transition-colors duration-300">
-                <div className="text-3xl font-bold text-white mb-1">50%</div>
-                <div className="text-sm text-slate-400">Faster Hiring</div>
-              </div>
-              <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/5 hover:bg-white/10 transition-colors duration-300">
-                <div className="text-3xl font-bold text-white mb-1">99%</div>
-                <div className="text-sm text-slate-400">Match Accuracy</div>
-              </div>
            </motion.div>
         </div>
       </div>
@@ -146,12 +138,6 @@ export default function LoginPage() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
-                    <Link
-                      href="#"
-                      className="text-sm text-primary hover:underline hover:text-primary/90"
-                    >
-                      Forgot password?
-                    </Link>
                   </div>
                   <div className="relative">
                     <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />

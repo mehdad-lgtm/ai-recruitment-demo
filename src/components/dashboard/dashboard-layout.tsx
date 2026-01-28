@@ -23,6 +23,7 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
+import { AdminViewSwitcher } from "./admin-view-switcher";
 
 interface NavItem {
   label: string;
@@ -36,6 +37,7 @@ interface DashboardLayoutProps {
   role: "admin" | "interviewer" | "recruiter";
   userName?: string;
   userEmail?: string;
+  isAdmin?: boolean;
 }
 
 const roleNavItems: Record<string, NavItem[]> = {
@@ -72,6 +74,7 @@ export function DashboardLayout({
   role,
   userName = "User",
   userEmail = "user@example.com",
+  isAdmin = false,
 }: DashboardLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -86,8 +89,15 @@ export function DashboardLayout({
   const navItems = roleNavItems[role] || [];
 
   const handleLogout = async () => {
-    await authClient.signOut();
-    router.push("/");
+    const { toast } = await import("sonner");
+    const toastId = toast.loading("Signing out...");
+    try {
+      await authClient.signOut();
+      toast.success("Signed out successfully", { id: toastId });
+      router.push("/");
+    } catch (error) {
+      toast.error("Failed to sign out", { id: toastId });
+    }
   };
 
   return (
@@ -229,6 +239,7 @@ export function DashboardLayout({
             </div>
 
             <div className="flex items-center gap-3">
+              {isAdmin && <AdminViewSwitcher />}
               <ThemeToggle />
               <button className="p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors relative">
                 <Bell className="h-5 w-5" />
