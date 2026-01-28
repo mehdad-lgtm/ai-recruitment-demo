@@ -176,40 +176,63 @@ export function DashboardLayout({
         </nav>
 
         {/* User Section */}
-        <div className="p-4 border-t border-border/50 bg-muted/30">
-          <div className="relative">
-            <button
-              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-background transition-colors border border-transparent hover:border-border/50 hover:shadow-sm"
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
-            >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-indigo-500 flex items-center justify-center text-primary-foreground font-bold shadow-md">
-                {userName.charAt(0).toUpperCase()}
-              </div>
-              <div className="flex-1 text-left min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">{userName}</p>
-                <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
-              </div>
-              <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform duration-200", userMenuOpen && "rotate-180")} />
-            </button>
-
+        <div className="p-4 border-t border-border/50 bg-muted/40 backdrop-blur-sm">
+          <div className="flex flex-col gap-2">
             <AnimatePresence>
               {userMenuOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute bottom-full left-0 right-0 mb-2 bg-popover/90 backdrop-blur-xl border border-border/50 rounded-xl shadow-xl overflow-hidden z-50"
+                  initial={{ opacity: 0, height: 0, y: 10 }}
+                  animate={{ opacity: 1, height: "auto", y: 0 }}
+                  exit={{ opacity: 0, height: 0, y: 10 }}
+                  className="bg-card/50 backdrop-blur-xl border border-border/40 rounded-2xl overflow-hidden shadow-2xl shadow-black/5"
                 >
+                  {/* Admin-only view switcher placed inside the user menu */}
+                  {isAdmin && (
+                    <div className="p-3 border-b border-border/10">
+                      <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] px-2 pb-2 opacity-50">
+                        Workspace View
+                      </div>
+                      <AdminViewSwitcher />
+                    </div>
+                  )}
+
                   <button
-                    className="w-full flex items-center gap-2 px-4 py-3 text-sm text-destructive hover:bg-destructive/10 transition-colors font-medium"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-destructive hover:bg-destructive/10 transition-all duration-200 font-semibold group"
                     onClick={handleLogout}
                   >
-                    <LogOut className="h-4 w-4" />
+                    <div className="p-1.5 rounded-lg bg-destructive/10 group-hover:bg-destructive/20 transition-colors">
+                      <LogOut className="h-4 w-4" />
+                    </div>
                     Sign out
                   </button>
                 </motion.div>
               )}
             </AnimatePresence>
+
+            <button
+              className={cn(
+                "w-full flex items-center gap-3 p-2.5 rounded-2xl transition-all duration-300 border border-transparent hover:border-border/50 hover:bg-background/80 group",
+                userMenuOpen && "bg-background/80 border-border/50 shadow-sm"
+              )}
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+            >
+              <div className="relative">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary via-primary/90 to-indigo-600 flex items-center justify-center text-primary-foreground font-bold shadow-lg shadow-primary/25 transition-transform group-hover:scale-105">
+                  {userName.charAt(0).toUpperCase()}
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-background bg-emerald-500 shadow-sm" />
+              </div>
+              <div className="flex-1 text-left min-w-0">
+                <p className="text-sm font-bold text-foreground truncate tracking-tight">{userName}</p>
+                <p className="text-[11px] text-muted-foreground truncate opacity-70 font-medium">{userEmail}</p>
+              </div>
+              <div className={cn(
+                "p-1 rounded-lg bg-muted/50 text-muted-foreground transition-all duration-300 group-hover:bg-primary/10 group-hover:text-primary",
+                userMenuOpen && "rotate-180 bg-primary/20 text-primary"
+              )}>
+                <ChevronDown className="h-3.5 w-3.5" />
+              </div>
+            </button>
           </div>
         </div>
       </aside>
@@ -239,7 +262,6 @@ export function DashboardLayout({
             </div>
 
             <div className="flex items-center gap-3">
-              {isAdmin && <AdminViewSwitcher />}
               <ThemeToggle />
               <button className="p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors relative">
                 <Bell className="h-5 w-5" />
