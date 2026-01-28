@@ -82,7 +82,17 @@ export default function SignUpPage() {
       if (result.error) {
         setError(result.error.message || "Failed to create account");
       } else {
-        router.push("/dashboard");
+        // Get user session to determine role-based redirect
+        const session = await authClient.getSession();
+        const userRole = (session.data?.user as { role?: string })?.role || "recruiter";
+        
+        // Redirect to role-specific dashboard
+        const roleHome: Record<string, string> = {
+          admin: "/admin",
+          interviewer: "/interviewer",
+          recruiter: "/recruiter",
+        };
+        router.push(roleHome[userRole] || "/recruiter");
       }
     } catch {
       setError("An unexpected error occurred. Please try again.");

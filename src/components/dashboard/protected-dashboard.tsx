@@ -2,7 +2,7 @@
 
 import { LoadingSpinner } from "@/components/ui";
 import { useAuth, type UserRole } from "@/hooks/use-auth";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { DashboardLayout } from "./dashboard-layout";
 
@@ -14,6 +14,7 @@ interface ProtectedDashboardProps {
 export function ProtectedDashboard({ children, allowedRoles }: ProtectedDashboardProps) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoading) {
@@ -35,6 +36,14 @@ export function ProtectedDashboard({ children, allowedRoles }: ProtectedDashboar
     }
   }, [isLoading, isAuthenticated, user, allowedRoles, router]);
 
+  // Derive dashboard role from current pathname (single source of truth)
+  const getDashboardRole = (): UserRole => {
+    if (pathname.startsWith("/admin")) return "admin";
+    if (pathname.startsWith("/interviewer")) return "interviewer";
+    if (pathname.startsWith("/recruiter")) return "recruiter";
+    return user?.role || "recruiter";
+  };
+
   const hasAccess = !isLoading && isAuthenticated && user && allowedRoles.includes(user.role);
 
   if (isLoading || !hasAccess) {
@@ -54,7 +63,7 @@ export function ProtectedDashboard({ children, allowedRoles }: ProtectedDashboar
 
   return (
     <DashboardLayout
-      role={user.role}
+      role={getDashboardRole()}
       userName={user.name}
       userEmail={user.email}
     >

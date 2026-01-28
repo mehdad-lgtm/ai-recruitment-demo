@@ -2,12 +2,12 @@ import { auth } from "@/lib/auth";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-// Define protected routes and their required roles
+// Define protected routes and their required roles (STRICT: one role per route)
+// This is the single source of truth for role-based access control
 const protectedRoutes = {
   "/admin": ["admin"],
-  "/interviewer": ["admin", "interviewer"],
-  "/recruiter": ["admin", "recruiter"],
-  "/dashboard": ["admin", "interviewer", "recruiter"],
+  "/interviewer": ["interviewer"],
+  "/recruiter": ["recruiter"],
 };
 
 // Public routes that don't require authentication
@@ -38,6 +38,18 @@ export async function proxy(request: NextRequest) {
   // Enforce role-based access for protected routes
   const userRole = (sessionData.user as { role?: string }).role || "recruiter";
 
+  // Safety fallback: redirect /dashboard to role-specific dashboard
+  // This should rarely be hit since login/signup redirect directly
+  if (pathname === "/dashboard" || pathname.startsWith("/dashboard/")) {
+    const roleHome: Record<string, string> = {
+      admin: "/admin",
+      interviewer: "/interviewer",
+      recruiter: "/recruiter",
+    };
+    const redirectUrl = new URL(roleHome[userRole] || "/recruiter", request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
+
   // Find matching protected prefix if any
   const matchedPrefix = Object.keys(protectedRoutes).find((prefix) => pathname.startsWith(prefix));
   if (matchedPrefix) {
@@ -49,7 +61,7 @@ export async function proxy(request: NextRequest) {
         interviewer: "/interviewer",
         recruiter: "/recruiter",
       };
-      const redirectUrl = new URL(roleHome[userRole] ?? "/dashboard", request.url);
+      const redirectUrl = new URL(roleHome[userRole] ?? "/recruiter", request.url);
       return NextResponse.redirect(redirectUrl);
     }
   }
