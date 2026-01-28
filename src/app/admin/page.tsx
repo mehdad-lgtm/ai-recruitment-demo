@@ -1,7 +1,7 @@
 "use client";
 
 import {
-    DashboardLayout,
+    ProtectedDashboard,
     QuickActions,
     RecentActivity,
     StatCard,
@@ -120,11 +120,7 @@ const quickActions = [
 
 export default function AdminDashboard() {
   return (
-    <DashboardLayout
-      role="admin"
-      userName="Admin User"
-      userEmail="admin@salesworks.com"
-    >
+    <ProtectedDashboard allowedRoles={["admin"]}>
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
@@ -180,6 +176,6 @@ export default function AdminDashboard() {
           ))}
         </div>
       </div>
-    </DashboardLayout>
+    </ProtectedDashboard>
   );
 }

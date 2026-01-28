@@ -1,7 +1,7 @@
 "use client";
 
 import {
-    DashboardLayout,
+    ProtectedDashboard,
     QuickActions,
     RecentActivity,
     StatCard,
@@ -157,11 +157,7 @@ const statusLabels: Record<string, string> = {
 
 export default function RecruiterDashboard() {
   return (
-    <DashboardLayout
-      role="recruiter"
-      userName="Recruiter"
-      userEmail="recruiter@salesworks.com"
-    >
+    <ProtectedDashboard allowedRoles={["admin", "recruiter"]}>
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground">Recruiter Portal</h1>
@@ -297,6 +293,6 @@ export default function RecruiterDashboard() {
           ))}
         </div>
       </div>
-    </DashboardLayout>
+    </ProtectedDashboard>
   );
 }

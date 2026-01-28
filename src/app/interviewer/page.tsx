@@ -1,7 +1,7 @@
 "use client";
 
 import {
-    DashboardLayout,
+    ProtectedDashboard,
     RecentActivity,
     StatCard,
 } from "@/components/dashboard";
@@ -100,11 +100,7 @@ const recentActivity = [
 
 export default function InterviewerDashboard() {
   return (
-    <DashboardLayout
-      role="interviewer"
-      userName="Interview User"
-      userEmail="interviewer@salesworks.com"
-    >
+    <ProtectedDashboard allowedRoles={["admin", "interviewer"]}>
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground">My Dashboard</h1>
@@ -232,6 +228,6 @@ export default function InterviewerDashboard() {
           })}
         </div>
       </div>
-    </DashboardLayout>
+    </ProtectedDashboard>
   );
 }

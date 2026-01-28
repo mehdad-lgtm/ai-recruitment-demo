@@ -1,0 +1,289 @@
+"use client";
+
+import {
+    CalendarMonthView,
+    CalendarProvider,
+    CalendarWeekView,
+    type ICalendarEvent,
+    type ICalendarUser
+} from "@/components/calendar";
+import { ProtectedDashboard } from "@/components/dashboard";
+import { Button } from "@/components/ui/button";
+import {
+    Calendar,
+    ChevronRight,
+    Clock,
+    List,
+    User,
+    Video
+} from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+
+// Mock data - replace with real API calls
+const mockUsers: ICalendarUser[] = [
+  { id: "int-001", name: "Current User", picturePath: null },
+];
+
+const mockSessions: ICalendarEvent[] = [
+  {
+    id: "s-001",
+    title: "Interview - John Doe",
+    description: "Software Developer position",
+    startDate: new Date().toISOString(),
+    endDate: new Date(Date.now() + 45 * 60 * 1000).toISOString(),
+    color: "blue",
+    user: mockUsers[0],
+    sessionType: "video",
+    candidateId: "c-001",
+    status: "scheduled",
+  },
+  {
+    id: "s-002",
+    title: "Interview - Sarah Smith",
+    description: "Product Manager position",
+    startDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+    endDate: new Date(Date.now() + 2.75 * 60 * 60 * 1000).toISOString(),
+    color: "green",
+    user: mockUsers[0],
+    sessionType: "in-person",
+    candidateId: "c-002",
+    status: "scheduled",
+  },
+  {
+    id: "s-003",
+    title: "Interview - Mike Johnson",
+    description: "Sales Executive position",
+    startDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    endDate: new Date(Date.now() + 24.5 * 60 * 60 * 1000).toISOString(),
+    color: "purple",
+    user: mockUsers[0],
+    sessionType: "video",
+    candidateId: "c-003",
+    status: "scheduled",
+  },
+  {
+    id: "s-004",
+    title: "Interview - Emily Brown",
+    description: "Marketing Specialist position",
+    startDate: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+    endDate: new Date(Date.now() + 48.75 * 60 * 60 * 1000).toISOString(),
+    color: "orange",
+    user: mockUsers[0],
+    sessionType: "phone",
+    candidateId: "c-004",
+    status: "scheduled",
+  },
+];
+
+const upcomingSessions = [
+  {
+    id: "s-001",
+    candidateName: "John Doe",
+    position: "Software Developer",
+    date: new Date(),
+    time: "09:00 AM",
+    duration: "45 min",
+    type: "Video Call",
+    status: "upcoming",
+  },
+  {
+    id: "s-002",
+    candidateName: "Sarah Smith",
+    position: "Product Manager",
+    date: new Date(),
+    time: "11:00 AM",
+    duration: "45 min",
+    type: "In-person",
+    status: "upcoming",
+  },
+  {
+    id: "s-003",
+    candidateName: "Mike Johnson",
+    position: "Sales Executive",
+    date: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    time: "10:00 AM",
+    duration: "30 min",
+    type: "Video Call",
+    status: "upcoming",
+  },
+];
+
+export default function SessionsPage() {
+  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
+  const [calendarView, setCalendarView] = useState<"month" | "week">("week");
+
+  return (
+    <ProtectedDashboard allowedRoles={["admin", "interviewer"]}>
+      {/* Page Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">My Sessions</h1>
+            <p className="text-muted-foreground mt-1">
+              View and manage your interview sessions.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex rounded-lg border border-border overflow-hidden">
+              <Button
+                variant={viewMode === "calendar" ? "default" : "ghost"}
+                size="sm"
+                className="rounded-none"
+                onClick={() => setViewMode("calendar")}
+              >
+                <Calendar className="h-4 w-4 mr-1" />
+                Calendar
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "ghost"}
+                size="sm"
+                className="rounded-none"
+                onClick={() => setViewMode("list")}
+              >
+                <List className="h-4 w-4 mr-1" />
+                List
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {viewMode === "calendar" ? (
+        <>
+          {/* Calendar View Toggles */}
+          <div className="mb-4 flex gap-2">
+            <Button
+              variant={calendarView === "week" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setCalendarView("week")}
+            >
+              Week View
+            </Button>
+            <Button
+              variant={calendarView === "month" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setCalendarView("month")}
+            >
+              Month View
+            </Button>
+          </div>
+
+          {/* Calendar */}
+          <CalendarProvider users={mockUsers} events={mockSessions}>
+            {calendarView === "week" ? (
+              <CalendarWeekView
+                onEventClick={(event) => {
+                  console.log("Event clicked:", event);
+                }}
+              />
+            ) : (
+              <CalendarMonthView
+                onEventClick={(event) => {
+                  console.log("Event clicked:", event);
+                }}
+              />
+            )}
+          </CalendarProvider>
+        </>
+      ) : (
+        /* List View */
+        <div className="space-y-6">
+          {/* Today's Sessions */}
+          <div className="bg-card rounded-xl border border-border overflow-hidden">
+            <div className="px-6 py-4 border-b border-border bg-muted/30">
+              <h3 className="font-semibold text-foreground">Today&apos;s Sessions</h3>
+            </div>
+            <div className="divide-y divide-border">
+              {upcomingSessions
+                .filter((s) => s.date.toDateString() === new Date().toDateString())
+                .map((session, index) => (
+                  <div
+                    key={session.id}
+                    className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors"
+                  >
+                    <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground">{session.candidateName}</p>
+                      <p className="text-sm text-muted-foreground">{session.position}</p>
+                      <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {session.time}
+                        </span>
+                        <span>•</span>
+                        <span>{session.duration}</span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <Video className="h-3 w-3" />
+                          {session.type}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="shrink-0 flex gap-2">
+                      <Link href={`/interviewer/briefs/${session.id}`}>
+                        <Button variant="outline" size="sm">
+                          View Brief
+                        </Button>
+                      </Link>
+                      {index === 0 && (
+                        <Button size="sm">
+                          Join Now
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              {upcomingSessions.filter((s) => s.date.toDateString() === new Date().toDateString()).length === 0 && (
+                <div className="text-center py-8">
+                  <Calendar className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
+                  <p className="text-muted-foreground">No sessions scheduled for today</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Upcoming Sessions */}
+          <div className="bg-card rounded-xl border border-border overflow-hidden">
+            <div className="px-6 py-4 border-b border-border bg-muted/30">
+              <h3 className="font-semibold text-foreground">Upcoming Sessions</h3>
+            </div>
+            <div className="divide-y divide-border">
+              {upcomingSessions
+                .filter((s) => s.date.toDateString() !== new Date().toDateString())
+                .map((session) => (
+                  <div
+                    key={session.id}
+                    className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors"
+                  >
+                    <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground">{session.candidateName}</p>
+                      <p className="text-sm text-muted-foreground">{session.position}</p>
+                      <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                        <span>{session.date.toLocaleDateString()}</span>
+                        <span>•</span>
+                        <span>{session.time}</span>
+                        <span>•</span>
+                        <span>{session.duration}</span>
+                      </div>
+                    </div>
+                    <Link href={`/interviewer/briefs/${session.id}`}>
+                      <Button variant="outline" size="sm">
+                        View Brief
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </Link>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </ProtectedDashboard>
+  );
+}
