@@ -64,7 +64,7 @@ export function useAuth(): UseAuthResult {
     try {
       await authClient.signOut();
       setUser(null);
-      router.push("/auth/login");
+      router.push("/");
     } catch (error) {
       console.error("Sign out failed:", error);
     }
@@ -86,7 +86,7 @@ export function useRequireRole(allowedRoles: UserRole[]) {
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
-        router.push("/auth/login");
+        router.push("/");
         return;
       }
 
@@ -97,7 +97,7 @@ export function useRequireRole(allowedRoles: UserRole[]) {
           interviewer: "/interviewer",
           recruiter: "/recruiter",
         };
-        router.push(roleHome[user.role] || "/dashboard");
+        router.push(roleHome[user.role] || "/recruiter");
         return;
       }
     }

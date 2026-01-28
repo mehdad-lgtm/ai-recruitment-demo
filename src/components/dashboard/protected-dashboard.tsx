@@ -19,7 +19,7 @@ export function ProtectedDashboard({ children, allowedRoles }: ProtectedDashboar
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated || !user) {
-        router.push("/auth/login");
+        router.push("/");
         return;
       }
 
@@ -30,7 +30,7 @@ export function ProtectedDashboard({ children, allowedRoles }: ProtectedDashboar
           interviewer: "/interviewer",
           recruiter: "/recruiter",
         };
-        router.push(roleHome[user.role] || "/dashboard");
+        router.push(roleHome[user.role] || "/recruiter");
         return;
       }
     }

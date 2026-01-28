@@ -3,4 +3,5 @@ export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 export { Input } from "./input";
 export { Label } from "./label";
 export { LoadingSpinner } from "./loading-spinner";
+export { ThemeToggle } from "./theme-toggle";
 

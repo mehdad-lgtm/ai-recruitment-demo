@@ -11,7 +11,7 @@ const protectedRoutes = {
 };
 
 // Public routes that don't require authentication
-const publicRoutes = ["/", "/auth/login", "/auth/signup", "/intake"];
+const publicRoutes = ["/", "/intake"];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -30,7 +30,7 @@ export async function proxy(request: NextRequest) {
   const sessionData = await auth.api.getSession({ headers: request.headers });
 
   if (!sessionData || !sessionData.session || !sessionData.user) {
-    const loginUrl = new URL("/auth/login", request.url);
+    const loginUrl = new URL("/", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }

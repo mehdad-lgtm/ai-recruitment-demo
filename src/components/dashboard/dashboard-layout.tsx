@@ -1,23 +1,24 @@
 "use client";
 
+import { ThemeToggle } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    BarChart3,
-    Bell,
-    Calendar,
-    ChevronDown,
-    Home,
-    LogOut,
-    Menu,
-    MessageSquare,
-    QrCode,
-    Search,
-    Settings,
-    Sparkles,
-    Users,
-    X
+  BarChart3,
+  Bell,
+  Calendar,
+  ChevronDown,
+  Home,
+  LogOut,
+  Menu,
+  MessageSquare,
+  QrCode,
+  Search,
+  Settings,
+  Sparkles,
+  Users,
+  X
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -86,7 +87,7 @@ export function DashboardLayout({
 
   const handleLogout = async () => {
     await authClient.signOut();
-    router.push("/auth/login");
+    router.push("/");
   };
 
   return (
@@ -228,6 +229,7 @@ export function DashboardLayout({
             </div>
 
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <button className="p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors relative">
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-background"></span>

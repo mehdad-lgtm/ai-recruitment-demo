@@ -1,216 +1,214 @@
 "use client";
 
-import { Button } from "@/components/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+  LoadingSpinner,
+} from "@/components/ui";
+import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
-import { ArrowRight, Bot, Calendar, CheckCircle, ChevronRight, Globe, Layers, Sparkles, Users } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 
-export default function Home() {
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
+export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await authClient.signIn.email({
+        email,
+        password,
+      });
+
+      if (result.error) {
+        setError(result.error.message || "Invalid credentials");
+      } else {
+        // Get user session to determine role-based redirect
+        const session = await authClient.getSession();
+        const userRole = (session.data?.user as { role?: string })?.role || "recruiter";
+        
+        // Redirect to role-specific dashboard
+        const roleHome: Record<string, string> = {
+          admin: "/admin",
+          interviewer: "/interviewer",
+          recruiter: "/recruiter",
+        };
+        router.push(roleHome[userRole] || "/recruiter");
       }
+    } catch {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden">
-      {/* Background Decor */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-background to-background dark:from-blue-950/20 dark:via-background dark:to-background" />
-        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl" />
+    <div className="min-h-screen flex text-foreground font-sans">
+      {/* Left Side - Branding */}
+      <div className="hidden lg:flex w-1/2 bg-slate-900 relative overflow-hidden items-center justify-center">
+        {/* Abstract shapes & Gradient */}
+        <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black" />
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-primary/20 blur-3xl animate-[pulse_4s_ease-in-out_infinite]" />
+        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-indigo-500/10 blur-3xl" />
+        
+        <div className="relative z-10 max-w-xl px-12 text-center text-white space-y-8">
+           <motion.div
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.8, ease: "easeOut" }}
+           >
+              <div className="inline-flex items-center justify-center p-3 bg-white/10 backdrop-blur-xl rounded-2xl mb-8 border border-white/10 shadow-2xl">
+                <Sparkles className="w-10 h-10 text-primary-foreground" />
+              </div>
+              <h1 className="text-5xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                Recruit Smarter
+              </h1>
+              <p className="text-xl text-slate-300 leading-relaxed font-light">
+                Join thousands of companies using AI to streamline their hiring process and find the perfect candidates.
+              </p>
+           </motion.div>
+           
+           <motion.div
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             transition={{ delay: 0.5, duration: 1 }}
+             className="grid grid-cols-2 gap-4 pt-12"
+           >
+              <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/5 hover:bg-white/10 transition-colors duration-300">
+                <div className="text-3xl font-bold text-white mb-1">50%</div>
+                <div className="text-sm text-slate-400">Faster Hiring</div>
+              </div>
+              <div className="bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/5 hover:bg-white/10 transition-colors duration-300">
+                <div className="text-3xl font-bold text-white mb-1">99%</div>
+                <div className="text-sm text-slate-400">Match Accuracy</div>
+              </div>
+           </motion.div>
+        </div>
       </div>
 
-      {/* Navbar */}
-      <header className="relative z-50 px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-gradient-to-tr from-primary to-indigo-600 rounded-lg shadow-lg shadow-primary/20">
-            <Sparkles className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-xl font-bold font-sans tracking-tight">Salesworks</span>
-        </div>
-        
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-          <Link href="#features" className="hover:text-foreground transition-colors">Features</Link>
-          <Link href="#how-it-works" className="hover:text-foreground transition-colors">How it Works</Link>
-          <Link href="#pricing" className="hover:text-foreground transition-colors">Pricing</Link>
-        </nav>
-
-        <div className="flex items-center gap-4">
-          <Link href="/auth/login">
-            <Button variant="ghost">Sign In</Button>
-          </Link>
-          <Link href="/auth/signup">
-            <Button className="rounded-full px-6 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-shadow">Get Started</Button>
-          </Link>
-        </div>
-      </header>
-
-      <main className="relative z-10 flex flex-col items-center justify-center pt-20 pb-32 px-4 max-w-6xl mx-auto text-center font-sans">
-        
-        {/* Hero Section */}
+      {/* Right Side - Form */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 relative bg-background">
         <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="space-y-6 max-w-4xl"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="w-full max-w-md space-y-8"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/20 text-primary text-xs font-medium tracking-wide mb-4">
-            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            AI-POWERED RECRUITMENT 2.0
+          <div className="space-y-2 text-center lg:text-left">
+            <h2 className="text-3xl font-bold tracking-tight">Welcome back</h2>
+            <p className="text-muted-foreground">
+              Enter your credentials to access your dashboard
+            </p>
           </div>
-          
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1]">
-            Hiring Reimagined with <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-500 to-purple-600 animate-gradient-x">
-              Intelligent Automation
-            </span>
-          </h1>
-          
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Automate screening, scheduling, and communication. Find the perfect candidates faster with our Earth-shattering AI technology.
-          </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
-            <Link href="/auth/signup">
-              <Button size="lg" className="h-12 px-8 rounded-full text-lg shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-                Start Free Trial
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link href="#demo">
-              <Button size="lg" variant="outline" className="h-12 px-8 rounded-full text-lg bg-background/50 backdrop-blur-sm hover:bg-background/80">
-                Watch Demo
-              </Button>
-            </Link>
-          </div>
+          <Card className="border-border/50 shadow-xl bg-card/50 backdrop-blur-xl">
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-xl">Sign in</CardTitle>
+              <CardDescription>
+                Enter your email and password below
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="name@example.com"
+                      className="pl-9 bg-background/50 backdrop-blur-sm"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    <Link
+                      href="#"
+                      className="text-sm text-primary hover:underline hover:text-primary/90"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      className="pl-9 pr-9 bg-background/50 backdrop-blur-sm"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md animate-fade-in">
+                    {error}
+                  </div>
+                )}
+
+                <Button className="w-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-shadow duration-300" type="submit" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <LoadingSpinner className="mr-2" size="sm" />
+                      Signing in...
+                    </>
+                  ) : (
+                    <>
+                      Sign In
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+            <CardFooter className="flex justify-center">
+              <p className="text-sm text-muted-foreground">
+                Need access? Contact your administrator
+              </p>
+            </CardFooter>
+          </Card>
         </motion.div>
-
-        {/* Roles Grid */}
-        <motion.div 
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-32 w-full text-left"
-        >
-          {/* Recruiter Card */}
-          <motion.div variants={item}>
-            <Link href="/recruiter" className="block group">
-              <div className="relative h-full p-8 rounded-3xl bg-white dark:bg-card border border-border/50 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Users className="h-24 w-24 text-blue-500" />
-                </div>
-                <div className="h-12 w-12 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-6 text-blue-600">
-                  <Globe className="h-6 w-6" />
-                </div>
-                <h3 className="text-2xl font-bold mb-3">Recruiter Portal</h3>
-                <p className="text-muted-foreground mb-6">
-                  Manage candidates with global reach. Generate QR codes and track intake analytics in real-time.
-                </p>
-                <div className="flex items-center text-blue-600 font-semibold group-hover:gap-2 transition-all">
-                  Access Portal <ChevronRight className="h-4 w-4 ml-1" />
-                </div>
-              </div>
-            </Link>
-          </motion.div>
-
-          {/* Interviewer Card */}
-          <motion.div variants={item}>
-            <Link href="/interviewer" className="block group">
-              <div className="relative h-full p-8 rounded-3xl bg-white dark:bg-card border border-border/50 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Calendar className="h-24 w-24 text-orange-500" />
-                </div>
-                <div className="h-12 w-12 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-6 text-orange-600">
-                   <Bot className="h-6 w-6" />
-                </div>
-                <h3 className="text-2xl font-bold mb-3">Interviewer Hub</h3>
-                <p className="text-muted-foreground mb-6">
-                  Streamlined session management. Get AI-generated briefs and submit feedback instantly.
-                </p>
-                <div className="flex items-center text-orange-600 font-semibold group-hover:gap-2 transition-all">
-                  Access Hub <ChevronRight className="h-4 w-4 ml-1" />
-                </div>
-              </div>
-            </Link>
-          </motion.div>
-
-           {/* Admin Card */}
-           <motion.div variants={item}>
-            <Link href="/admin" className="block group">
-              <div className="relative h-full p-8 rounded-3xl bg-white dark:bg-card border border-border/50 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Layers className="h-24 w-24 text-purple-500" />
-                </div>
-                <div className="h-12 w-12 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-6 text-purple-600">
-                  <Sparkles className="h-6 w-6" />
-                </div>
-                <h3 className="text-2xl font-bold mb-3">Admin Control</h3>
-                <p className="text-muted-foreground mb-6">
-                  Full system oversight. Configure AI parameters, manage users, and view deep analytics.
-                </p>
-                <div className="flex items-center text-purple-600 font-semibold group-hover:gap-2 transition-all">
-                  Access Dashboard <ChevronRight className="h-4 w-4 ml-1" />
-                </div>
-              </div>
-            </Link>
-          </motion.div>
-        </motion.div>
-
-        {/* Stats Section */}
-        <div className="mt-32 grid grid-cols-2 md:grid-cols-4 gap-8 w-full max-w-5xl">
-          {[
-            { label: "Candidates Processed", value: "10k+", icon: Users },
-            { label: "Time Saved", value: "85%", icon: CheckCircle },
-            { label: "Interviews Held", value: "500+", icon: Calendar },
-            { label: "Active Recruiters", value: "50+", icon: Globe },
-          ].map((stat, i) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="flex flex-col items-center p-6 rounded-2xl bg-white/50 dark:bg-white/5 border border-white/20 backdrop-blur-sm"
-            >
-              <stat.icon className="h-8 w-8 text-primary mb-3 opacity-80" />
-              <div className="text-3xl font-bold text-foreground">{stat.value}</div>
-              <div className="text-sm text-muted-foreground font-medium uppercase tracking-wide mt-1">{stat.label}</div>
-            </motion.div>
-          ))}
-        </div>
-
-      </main>
-      
-      {/* Footer */}
-      <footer className="border-t border-border/50 bg-muted/20 relative z-10">
-        <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-primary rounded-lg">
-               <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <span className="font-bold text-lg">Salesworks</span>
-          </div>
-          <div className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Salesworks AI Recruitment. All rights reserved.
-          </div>
-          <div className="flex gap-6 text-sm font-medium text-muted-foreground">
-            <Link href="#" className="hover:text-foreground">Privacy</Link>
-            <Link href="#" className="hover:text-foreground">Terms</Link>
-            <Link href="#" className="hover:text-foreground">Contact</Link>
-          </div>
-        </div>
-      </footer>
+      </div>
     </div>
   );
 }
