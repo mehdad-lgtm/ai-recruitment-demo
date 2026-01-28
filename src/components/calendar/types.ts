@@ -16,6 +16,8 @@ export interface ICalendarUser {
   id: string;
   name: string;
   picturePath: string | null;
+  role?: string;
+  color?: TEventColor;
 }
 
 // Event interface

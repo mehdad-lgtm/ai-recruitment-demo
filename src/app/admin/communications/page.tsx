@@ -455,7 +455,7 @@ export default function AdminCommunicationsPage() {
                     <div className="flex items-center gap-2 mb-3 p-2 bg-blue-500/10 rounded-lg">
                       <Bot className="h-4 w-4 text-blue-500" />
                       <span className="text-sm text-blue-600">
-                        AI is handling this conversation. Click "Takeover" to respond manually.
+                        AI is handling this conversation. Click &quot;Takeover&quot; to respond manually.
                       </span>
                     </div>
                   )}

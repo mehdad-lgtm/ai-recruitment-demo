@@ -1,28 +1,28 @@
 "use client";
 
 import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Input,
-  Label,
-  LoadingSpinner,
+    Button,
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+    Input,
+    Label,
+    LoadingSpinner,
 } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
 import {
-  ArrowRight,
-  Check,
-  Eye,
-  EyeOff,
-  Lock,
-  Mail,
-  Sparkles,
-  User,
+    ArrowRight,
+    Check,
+    Eye,
+    EyeOff,
+    Lock,
+    Mail,
+    Sparkles,
+    User,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -295,7 +295,10 @@ export default function SignUpPage() {
                     disabled={isLoading || !allRequirementsMet || !passwordsMatch || !acceptTerms}
                 >
                   {isLoading ? (
-                    <LoadingSpinner className="mr-2" size="sm" />
+                    <>
+                      <LoadingSpinner className="mr-2" size="sm" />
+                      Creating account...
+                    </>
                   ) : (
                     <>
                       Create Account

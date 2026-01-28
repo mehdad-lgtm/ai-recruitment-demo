@@ -3,7 +3,7 @@
 import { LoadingSpinner } from "@/components/ui";
 import { useAuth, type UserRole } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { DashboardLayout } from "./dashboard-layout";
 
 interface ProtectedDashboardProps {
@@ -14,7 +14,6 @@ interface ProtectedDashboardProps {
 export function ProtectedDashboard({ children, allowedRoles }: ProtectedDashboardProps) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
-  const [hasAccess, setHasAccess] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
@@ -33,10 +32,10 @@ export function ProtectedDashboard({ children, allowedRoles }: ProtectedDashboar
         router.push(roleHome[user.role] || "/dashboard");
         return;
       }
-
-      setHasAccess(true);
     }
   }, [isLoading, isAuthenticated, user, allowedRoles, router]);
+
+  const hasAccess = !isLoading && isAuthenticated && user && allowedRoles.includes(user.role);
 
   if (isLoading || !hasAccess) {
     return (

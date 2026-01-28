@@ -24,10 +24,10 @@ import { useState } from "react";
 
 // Mock users (interviewers)
 const mockInterviewers: ICalendarUser[] = [
-  { id: "u-001", name: "Jane Smith", role: "interviewer", color: "blue" },
-  { id: "u-002", name: "Michael Lee", role: "interviewer", color: "green" },
-  { id: "u-003", name: "Sarah Wong", role: "interviewer", color: "purple" },
-  { id: "u-004", name: "David Chen", role: "interviewer", color: "orange" },
+  { id: "u-001", name: "Jane Smith", picturePath: null, role: "interviewer", color: "blue" },
+  { id: "u-002", name: "Michael Lee", picturePath: null, role: "interviewer", color: "green" },
+  { id: "u-003", name: "Sarah Wong", picturePath: null, role: "interviewer", color: "purple" },
+  { id: "u-004", name: "David Chen", picturePath: null, role: "interviewer", color: "orange" },
 ];
 
 // Mock interview sessions
@@ -35,32 +35,36 @@ const mockSessions: ICalendarEvent[] = [
   {
     id: "s-001",
     title: "John Doe - Software Developer",
-    startDate: new Date(new Date().setHours(9, 0, 0, 0)),
-    endDate: new Date(new Date().setHours(10, 0, 0, 0)),
+    description: "Technical interview",
+    startDate: new Date(new Date().setHours(9, 0, 0, 0)).toISOString(),
+    endDate: new Date(new Date().setHours(10, 0, 0, 0)).toISOString(),
     color: "blue",
     user: mockInterviewers[0],
   },
   {
     id: "s-002",
     title: "Sarah Smith - Product Manager",
-    startDate: new Date(new Date().setHours(11, 0, 0, 0)),
-    endDate: new Date(new Date().setHours(12, 0, 0, 0)),
+    description: "Behavioral interview",
+    startDate: new Date(new Date().setHours(11, 0, 0, 0)).toISOString(),
+    endDate: new Date(new Date().setHours(12, 0, 0, 0)).toISOString(),
     color: "green",
     user: mockInterviewers[1],
   },
   {
     id: "s-003",
     title: "Mike Johnson - Sales Executive",
-    startDate: new Date(new Date().setHours(14, 0, 0, 0)),
-    endDate: new Date(new Date().setHours(15, 0, 0, 0)),
+    description: "Initial screening",
+    startDate: new Date(new Date().setHours(14, 0, 0, 0)).toISOString(),
+    endDate: new Date(new Date().setHours(15, 0, 0, 0)).toISOString(),
     color: "purple",
     user: mockInterviewers[2],
   },
   {
     id: "s-004",
     title: "Emily Chen - UX Designer",
-    startDate: new Date(new Date().setHours(16, 0, 0, 0)),
-    endDate: new Date(new Date().setHours(17, 0, 0, 0)),
+    description: "Portfolio review",
+    startDate: new Date(new Date().setHours(16, 0, 0, 0)).toISOString(),
+    endDate: new Date(new Date().setHours(17, 0, 0, 0)).toISOString(),
     color: "blue",
     user: mockInterviewers[0],
   },
@@ -152,6 +156,11 @@ const typeColors: Record<string, string> = {
   portfolio: "bg-pink-500/10 text-pink-600",
 };
 
+// Pre-calculate dates outside component to avoid impure function calls
+const today = new Date();
+const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
 export default function AdminInterviewsPage() {
   const [view, setView] = useState<"calendar" | "list">("calendar");
   const [calendarView, setCalendarView] = useState<"week" | "month">("week");
@@ -186,10 +195,6 @@ export default function AdminInterviewsPage() {
   };
 
   const formatDate = (date: Date) => {
-    const today = new Date();
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
     if (date.toDateString() === today.toDateString()) return "Today";
     if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
     if (date.toDateString() === tomorrow.toDateString()) return "Tomorrow";
@@ -249,7 +254,7 @@ export default function AdminInterviewsPage() {
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">{stats.today}</p>
-              <p className="text-sm text-muted-foreground">Today's Sessions</p>
+              <p className="text-sm text-muted-foreground">Today&apos;s Sessions</p>
             </div>
           </div>
         </div>

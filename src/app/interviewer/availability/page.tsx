@@ -25,6 +25,7 @@ import { useState } from "react";
 const currentUser: ICalendarUser = {
   id: "u-002",
   name: "Jane Interviewer",
+  picturePath: null,
   role: "interviewer",
   color: "green",
 };
@@ -56,24 +57,27 @@ const mockAvailabilitySlots: ICalendarEvent[] = [
   {
     id: "av-001",
     title: "Available",
-    startDate: new Date(new Date().setHours(9, 0, 0, 0)),
-    endDate: new Date(new Date().setHours(12, 0, 0, 0)),
+    description: "Available slot",
+    startDate: new Date(new Date().setHours(9, 0, 0, 0)).toISOString(),
+    endDate: new Date(new Date().setHours(12, 0, 0, 0)).toISOString(),
     color: "green",
     user: currentUser,
   },
   {
     id: "av-002",
     title: "Available",
-    startDate: new Date(new Date().setHours(14, 0, 0, 0)),
-    endDate: new Date(new Date().setHours(17, 0, 0, 0)),
+    description: "Available slot",
+    startDate: new Date(new Date().setHours(14, 0, 0, 0)).toISOString(),
+    endDate: new Date(new Date().setHours(17, 0, 0, 0)).toISOString(),
     color: "green",
     user: currentUser,
   },
   {
     id: "av-003",
     title: "Available",
-    startDate: addDays(new Date().setHours(10, 0, 0, 0), 1),
-    endDate: addDays(new Date().setHours(16, 0, 0, 0), 1),
+    description: "Available slot",
+    startDate: addDays(new Date().setHours(10, 0, 0, 0), 1).toISOString(),
+    endDate: addDays(new Date().setHours(16, 0, 0, 0), 1).toISOString(),
     color: "green",
     user: currentUser,
   },
@@ -84,16 +88,18 @@ const blockedSlots: ICalendarEvent[] = [
   {
     id: "bl-001",
     title: "Interview: John Doe",
-    startDate: new Date(new Date().setHours(10, 0, 0, 0)),
-    endDate: new Date(new Date().setHours(11, 0, 0, 0)),
+    description: "Scheduled interview",
+    startDate: new Date(new Date().setHours(10, 0, 0, 0)).toISOString(),
+    endDate: new Date(new Date().setHours(11, 0, 0, 0)).toISOString(),
     color: "blue",
     user: currentUser,
   },
   {
     id: "bl-002",
     title: "Team Meeting",
-    startDate: addDays(new Date().setHours(14, 0, 0, 0), 2),
-    endDate: addDays(new Date().setHours(15, 0, 0, 0), 2),
+    description: "Team meeting",
+    startDate: addDays(new Date().setHours(14, 0, 0, 0), 2).toISOString(),
+    endDate: addDays(new Date().setHours(15, 0, 0, 0), 2).toISOString(),
     color: "purple",
     user: currentUser,
   },
@@ -132,8 +138,8 @@ function AvailabilityContent() {
     const nextWeekSlots = availabilitySlots.map((slot) => ({
       ...slot,
       id: `${slot.id}-copy`,
-      startDate: addWeeks(new Date(slot.startDate), 1),
-      endDate: addWeeks(new Date(slot.endDate), 1),
+      startDate: addWeeks(new Date(slot.startDate), 1).toISOString(),
+      endDate: addWeeks(new Date(slot.endDate), 1).toISOString(),
     }));
     setAvailabilitySlots([...availabilitySlots, ...nextWeekSlots]);
   };

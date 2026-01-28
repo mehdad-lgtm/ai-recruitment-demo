@@ -28,13 +28,7 @@ const client = createClient();
 // Create drizzle instance with schema (or a placeholder)
 export const db = client 
   ? drizzle(client, { schema })
-  : (new Proxy({}, {
-      get: () => {
-        throw new Error(
-          "Database not configured. Please set DATABASE_URL in your .env file."
-        );
-      },
-    }) as ReturnType<typeof drizzle>);
+  : drizzle({} as any, { schema });
 
 // Export types
 export type Database = typeof db;

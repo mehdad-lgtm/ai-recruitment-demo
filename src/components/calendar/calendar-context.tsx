@@ -41,23 +41,33 @@ const DEFAULT_VISIBLE_HOURS: TVisibleHours = { from: 8, to: 19 };
 
 interface CalendarProviderProps {
   children: ReactNode;
-  users: ICalendarUser[];
-  events: ICalendarEvent[];
+  users?: ICalendarUser[];
+  events?: ICalendarEvent[];
+  initialUsers?: ICalendarUser[];
+  initialEvents?: ICalendarEvent[];
   initialDate?: Date;
+  initialWorkingHours?: { start: number; end: number };
+  initialVisibleHours?: { start: number; end: number };
 }
 
 export function CalendarProvider({ 
   children, 
-  users, 
-  events: initialEvents,
-  initialDate 
+  users,
+  initialUsers,
+  events: initialEventsLegacy,
+  initialEvents: initialEventsProp,
+  initialDate,
+  initialWorkingHours,
+  initialVisibleHours
 }: CalendarProviderProps) {
   const [badgeVariant, setBadgeVariant] = useState<TBadgeVariant>("colored");
-  const [visibleHours, setVisibleHours] = useState<TVisibleHours>(DEFAULT_VISIBLE_HOURS);
-  const [workingHours, setWorkingHours] = useState<TWorkingHours>(DEFAULT_WORKING_HOURS);
+  const [visibleHours, setVisibleHours] = useState<TVisibleHours>(initialVisibleHours ? { from: initialVisibleHours.start, to: initialVisibleHours.end } : DEFAULT_VISIBLE_HOURS);
+  const [workingHours, setWorkingHours] = useState<TWorkingHours>(initialWorkingHours ? { ...DEFAULT_WORKING_HOURS, 1: { from: initialWorkingHours.start, to: initialWorkingHours.end }, 2: { from: initialWorkingHours.start, to: initialWorkingHours.end }, 3: { from: initialWorkingHours.start, to: initialWorkingHours.end }, 4: { from: initialWorkingHours.start, to: initialWorkingHours.end }, 5: { from: initialWorkingHours.start, to: initialWorkingHours.end } } : DEFAULT_WORKING_HOURS);
   const [selectedDate, setSelectedDateState] = useState(initialDate || new Date());
   const [selectedUserId, setSelectedUserId] = useState<string | "all">("all");
+  const initialEvents = initialEventsProp || initialEventsLegacy || [];
   const [events, setEvents] = useState<ICalendarEvent[]>(initialEvents);
+  const calendarUsers = initialUsers || users || [];
 
   const handleSelectDate = (date: Date | undefined) => {
     if (!date) return;
@@ -73,7 +83,7 @@ export function CalendarProvider({
         setSelectedUserId,
         badgeVariant,
         setBadgeVariant,
-        users,
+        users: calendarUsers,
         visibleHours,
         setVisibleHours,
         workingHours,

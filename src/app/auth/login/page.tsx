@@ -1,16 +1,16 @@
 "use client";
 
 import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Input,
-  Label,
-  LoadingSpinner,
+    Button,
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+    Input,
+    Label,
+    LoadingSpinner,
 } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
@@ -219,7 +219,10 @@ export default function LoginPage() {
 
                 <Button className="w-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-shadow duration-300" type="submit" disabled={isLoading}>
                   {isLoading ? (
-                    <LoadingSpinner className="mr-2" size="sm" />
+                    <>
+                      <LoadingSpinner className="mr-2" size="sm" />
+                      Signing in...
+                    </>
                   ) : (
                     <>
                       Sign In

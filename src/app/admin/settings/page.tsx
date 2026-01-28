@@ -1,608 +1,536 @@
 "use client";
 
+import { createUser, deleteUser, getAllUsers, toggleUserStatus, updateUser, type ActionResponse } from "@/app/actions/users";
 import { ProtectedDashboard } from "@/components/dashboard";
+import { LoadingSpinner } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
     Bell,
     Bot,
-    Calendar,
     Check,
-    Clock,
-    Database,
     Globe,
-    Key,
-    Lock,
-    Mail,
-    MessageSquare,
-    Phone,
-    Save,
-    Settings,
+    Pencil,
+    Plus,
+    Settings as SettingsIcon,
     Shield,
+    Trash2,
     User,
     Users,
-    Webhook
+    X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-const settingsSections = [
-  { id: "general", label: "General", icon: Settings },
-  { id: "ai", label: "AI Configuration", icon: Bot },
-  { id: "users", label: "Users & Roles", icon: Users },
-  { id: "integrations", label: "Integrations", icon: Webhook },
-  { id: "notifications", label: "Notifications", icon: Bell },
-  { id: "security", label: "Security", icon: Shield },
-];
-
-// Mock data
-const mockUsers = [
-  { id: "u-001", name: "Admin User", email: "admin@company.com", role: "admin", status: "active" },
-  { id: "u-002", name: "Jane Smith", email: "jane@company.com", role: "interviewer", status: "active" },
-  { id: "u-003", name: "Michael Lee", email: "michael@company.com", role: "interviewer", status: "active" },
-  { id: "u-004", name: "HR Team", email: "hr@company.com", role: "recruiter", status: "active" },
-  { id: "u-005", name: "Sarah Wong", email: "sarah@company.com", role: "interviewer", status: "inactive" },
-];
-
-const roleColors: Record<string, string> = {
-  admin: "bg-purple-500/10 text-purple-600",
-  interviewer: "bg-blue-500/10 text-blue-600",
-  recruiter: "bg-green-500/10 text-green-600",
+type UserData = {
+  id: string;
+  name: string;
+  email: string;
+  role: "admin" | "interviewer" | "recruiter";
+  phone: string | null;
+  department: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  emailVerified: boolean;
 };
 
-export default function AdminSettingsPage() {
-  const [activeSection, setActiveSection] = useState("general");
-  const [hasChanges, setHasChanges] = useState(false);
+type ModalMode = "create" | "edit" | null;
 
-  // General Settings State
-  const [companyName, setCompanyName] = useState("Acme Corporation");
-  const [companyEmail, setCompanyEmail] = useState("hr@acme.com");
-  const [timezone, setTimezone] = useState("Asia/Singapore");
+export default function SettingsPage() {
+  const [activeSection, setActiveSection] = useState("users");
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [modalMode, setModalMode] = useState<ModalMode>(null);
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  // AI Settings State
-  const [aiEnabled, setAiEnabled] = useState(true);
-  const [aiVoiceEnabled, setAiVoiceEnabled] = useState(true);
-  const [aiLanguage, setAiLanguage] = useState("en");
-  const [aiConfidenceThreshold, setAiConfidenceThreshold] = useState(0.7);
-  const [aiAutoHandoff, setAiAutoHandoff] = useState(true);
-
-  // Notification Settings State
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [smsNotifications, setSmsNotifications] = useState(false);
-  const [slackNotifications, setSlackNotifications] = useState(true);
-
-  const handleSave = () => {
-    // API call to save settings
-    setHasChanges(false);
+  const loadUsers = async () => {
+    setLoading(true);
+    const result = await getAllUsers();
+    if (result.success) {
+      setUsers(result.data);
+    } else {
+      toast.error("Failed to load users");
+    }
+    setLoading(false);
   };
 
-  const renderSettingsContent = () => {
-    switch (activeSection) {
-      case "general":
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-lg font-semibold text-foreground mb-4">Company Information</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Company Name</label>
-                  <input
-                    type="text"
-                    value={companyName}
-                    onChange={(e) => { setCompanyName(e.target.value); setHasChanges(true); }}
-                    className="w-full max-w-md px-3 py-2 bg-muted border border-border rounded-lg text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Contact Email</label>
-                  <input
-                    type="email"
-                    value={companyEmail}
-                    onChange={(e) => { setCompanyEmail(e.target.value); setHasChanges(true); }}
-                    className="w-full max-w-md px-3 py-2 bg-muted border border-border rounded-lg text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Timezone</label>
-                  <select
-                    value={timezone}
-                    onChange={(e) => { setTimezone(e.target.value); setHasChanges(true); }}
-                    className="w-full max-w-md px-3 py-2 bg-muted border border-border rounded-lg text-sm"
-                  >
-                    <option value="Asia/Singapore">Asia/Singapore (GMT+8)</option>
-                    <option value="Asia/Tokyo">Asia/Tokyo (GMT+9)</option>
-                    <option value="America/New_York">America/New_York (EST)</option>
-                    <option value="Europe/London">Europe/London (GMT)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+  // Fetch users
+  useEffect(() => {
+    loadUsers(); // eslint-disable-line react-hooks/set-state-in-effect
+  }, []);
 
-            <div className="border-t border-border pt-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Default Settings</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Default Interview Duration</label>
-                  <select className="w-full max-w-md px-3 py-2 bg-muted border border-border rounded-lg text-sm">
-                    <option value="30">30 minutes</option>
-                    <option value="45">45 minutes</option>
-                    <option value="60">60 minutes</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Working Hours</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="time"
-                      defaultValue="09:00"
-                      className="px-3 py-2 bg-muted border border-border rounded-lg text-sm"
-                    />
-                    <span className="text-muted-foreground">to</span>
-                    <input
-                      type="time"
-                      defaultValue="18:00"
-                      className="px-3 py-2 bg-muted border border-border rounded-lg text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+  const handleCreateUser = () => {
+    setModalMode("create");
+    setSelectedUser(null);
+    setShowUserModal(true);
+  };
 
-      case "ai":
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-lg font-semibold text-foreground mb-4">AI Chat Configuration</h2>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-foreground">Enable AI Chat</p>
-                    <p className="text-sm text-muted-foreground">Allow AI to handle initial candidate conversations</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={aiEnabled}
-                      onChange={(e) => { setAiEnabled(e.target.checked); setHasChanges(true); }}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                  </label>
-                </div>
+  const handleEditUser = (user: UserData) => {
+    setModalMode("edit");
+    setSelectedUser(user);
+    setShowUserModal(true);
+  };
 
-                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-foreground">Enable AI Voice Calls</p>
-                    <p className="text-sm text-muted-foreground">Allow AI to make and receive voice calls</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={aiVoiceEnabled}
-                      onChange={(e) => { setAiVoiceEnabled(e.target.checked); setHasChanges(true); }}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                  </label>
-                </div>
+  const handleSubmitUser = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
 
-                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-foreground">Auto Handoff to Human</p>
-                    <p className="text-sm text-muted-foreground">Automatically transfer to human when confidence is low</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={aiAutoHandoff}
-                      onChange={(e) => { setAiAutoHandoff(e.target.checked); setHasChanges(true); }}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                  </label>
-                </div>
-              </div>
-            </div>
+    const formData = new FormData(event.currentTarget);
+    
+    const promise = modalMode === "create" 
+      ? createUser(formData)
+      : updateUser(formData);
 
-            <div className="border-t border-border pt-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">AI Parameters</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Primary Language</label>
-                  <select
-                    value={aiLanguage}
-                    onChange={(e) => { setAiLanguage(e.target.value); setHasChanges(true); }}
-                    className="w-full max-w-md px-3 py-2 bg-muted border border-border rounded-lg text-sm"
-                  >
-                    <option value="en">English</option>
-                    <option value="zh">Chinese (Mandarin)</option>
-                    <option value="ms">Malay</option>
-                    <option value="ta">Tamil</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Confidence Threshold: {Math.round(aiConfidenceThreshold * 100)}%
-                  </label>
-                  <input
-                    type="range"
-                    min="0.5"
-                    max="0.95"
-                    step="0.05"
-                    value={aiConfidenceThreshold}
-                    onChange={(e) => { setAiConfidenceThreshold(parseFloat(e.target.value)); setHasChanges(true); }}
-                    className="w-full max-w-md"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Below this threshold, conversations will be flagged for human review
-                  </p>
-                </div>
-              </div>
-            </div>
+    toast.promise(promise, {
+      loading: `${modalMode === "create" ? "Creating" : "Updating"} user...`,
+      success: (result: ActionResponse) => {
+        if (result.success) {
+          setShowUserModal(false);
+          setModalMode(null);
+          setSelectedUser(null);
+          loadUsers();
+          return `User ${modalMode === "create" ? "created" : "updated"} successfully!`;
+        }
+        throw new Error(result.error || "Operation failed");
+      },
+      error: (error: Error) => error.message,
+    });
 
-            <div className="border-t border-border pt-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Knowledge Base</h2>
-              <div className="p-4 border border-dashed border-border rounded-lg text-center">
-                <Database className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-foreground mb-1">Upload documents to train AI</p>
-                <p className="text-xs text-muted-foreground mb-3">PDF, DOCX, or TXT files up to 10MB</p>
-                <Button variant="outline" size="sm">Upload Documents</Button>
-              </div>
-            </div>
-          </div>
-        );
+    setSubmitting(false);
+  };
 
-      case "users":
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-foreground">Team Members</h2>
-              <Button size="sm">
-                <User className="h-4 w-4 mr-2" />
-                Add User
-              </Button>
-            </div>
+  const handleDeleteUser = async (userId: string) => {
+    const promise = deleteUser(userId);
+    
+    toast.promise(promise, {
+      loading: "Deleting user...",
+      success: (result: ActionResponse) => {
+        if (result.success) {
+          setDeleteConfirm(null);
+          loadUsers();
+          return "User deleted successfully!";
+        }
+        throw new Error(result.error || "Failed to delete user");
+      },
+      error: (error: Error) => error.message,
+    });
+  };
 
-            <div className="bg-muted/30 rounded-xl border border-border overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-muted/50">
-                  <tr>
-                    <th className="text-left p-4 font-medium text-muted-foreground">User</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground">Role</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground">Status</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {mockUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold text-sm">
-                            {user.name.charAt(0)}
-                          </div>
-                          <div>
-                            <p className="font-medium text-foreground">{user.name}</p>
-                            <p className="text-sm text-muted-foreground">{user.email}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className={cn("px-2 py-1 rounded-full text-xs font-medium capitalize", roleColors[user.role])}>
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <span className={cn(
-                          "px-2 py-1 rounded-full text-xs font-medium capitalize",
-                          user.status === "active" ? "bg-green-500/10 text-green-600" : "bg-gray-500/10 text-gray-600"
-                        )}>
-                          {user.status}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm">Edit</Button>
-                          <Button variant="ghost" size="sm" className="text-destructive">Remove</Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        );
+  const handleToggleStatus = async (userId: string) => {
+    const promise = toggleUserStatus(userId);
+    
+    toast.promise(promise, {
+      loading: "Updating status...",
+      success: (result: ActionResponse) => {
+        if (result.success) {
+          loadUsers();
+          return "User status updated!";
+        }
+        throw new Error(result.error || "Failed to update status");
+      },
+      error: (error: Error) => error.message,
+    });
+  };
 
-      case "integrations":
-        return (
-          <div className="space-y-6">
-            <h2 className="text-lg font-semibold text-foreground">Connected Services</h2>
+  const sections = [
+    { id: "general", label: "General", icon: SettingsIcon },
+    { id: "ai", label: "AI Configuration", icon: Bot },
+    { id: "users", label: "Users & Roles", icon: Users },
+    { id: "integrations", label: "Integrations", icon: Globe },
+    { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "security", label: "Security", icon: Shield },
+  ];
 
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { name: "WhatsApp Business", icon: MessageSquare, status: "connected", color: "green" },
-                { name: "Google Calendar", icon: Calendar, status: "connected", color: "blue" },
-                { name: "Twilio (Voice)", icon: Phone, status: "connected", color: "red" },
-                { name: "Slack", icon: Bell, status: "disconnected", color: "purple" },
-                { name: "Gmail / SMTP", icon: Mail, status: "connected", color: "orange" },
-                { name: "JobStreet API", icon: Globe, status: "disconnected", color: "blue" },
-              ].map((integration) => {
-                const Icon = integration.icon;
-                return (
-                  <div
-                    key={integration.name}
-                    className="flex items-center justify-between p-4 bg-card rounded-xl border border-border"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "p-2 rounded-lg",
-                        integration.color === "green" && "bg-green-500/10",
-                        integration.color === "blue" && "bg-blue-500/10",
-                        integration.color === "red" && "bg-red-500/10",
-                        integration.color === "purple" && "bg-purple-500/10",
-                        integration.color === "orange" && "bg-orange-500/10"
-                      )}>
-                        <Icon className={cn(
-                          "h-5 w-5",
-                          integration.color === "green" && "text-green-500",
-                          integration.color === "blue" && "text-blue-500",
-                          integration.color === "red" && "text-red-500",
-                          integration.color === "purple" && "text-purple-500",
-                          integration.color === "orange" && "text-orange-500"
-                        )} />
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground">{integration.name}</p>
-                        <p className={cn(
-                          "text-sm capitalize",
-                          integration.status === "connected" ? "text-green-600" : "text-muted-foreground"
-                        )}>
-                          {integration.status === "connected" && <Check className="h-3 w-3 inline-block mr-1" />}
-                          {integration.status}
-                        </p>
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      {integration.status === "connected" ? "Configure" : "Connect"}
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="border-t border-border pt-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">API Keys</h2>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <Key className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium text-foreground">Production API Key</p>
-                      <p className="text-sm text-muted-foreground font-mono">sk-prod-****-****-****-7f3d</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">Copy</Button>
-                    <Button variant="outline" size="sm">Regenerate</Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case "notifications":
-        return (
-          <div className="space-y-6">
-            <h2 className="text-lg font-semibold text-foreground">Notification Preferences</h2>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium text-foreground">Email Notifications</p>
-                    <p className="text-sm text-muted-foreground">Receive updates via email</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={emailNotifications}
-                    onChange={(e) => { setEmailNotifications(e.target.checked); setHasChanges(true); }}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium text-foreground">SMS Notifications</p>
-                    <p className="text-sm text-muted-foreground">Receive updates via SMS</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={smsNotifications}
-                    onChange={(e) => { setSmsNotifications(e.target.checked); setHasChanges(true); }}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Bell className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium text-foreground">Slack Notifications</p>
-                    <p className="text-sm text-muted-foreground">Receive updates in Slack</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={slackNotifications}
-                    onChange={(e) => { setSlackNotifications(e.target.checked); setHasChanges(true); }}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                </label>
-              </div>
-            </div>
-
-            <div className="border-t border-border pt-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Notification Events</h2>
-              <div className="space-y-3">
-                {[
-                  "New candidate registered",
-                  "Interview scheduled",
-                  "Interview completed",
-                  "AI handoff requested",
-                  "Candidate hired",
-                ].map((event) => (
-                  <div key={event} className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-                    <input type="checkbox" defaultChecked className="rounded border-border" />
-                    <span className="text-sm text-foreground">{event}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-
-      case "security":
-        return (
-          <div className="space-y-6">
-            <h2 className="text-lg font-semibold text-foreground">Security Settings</h2>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Lock className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium text-foreground">Two-Factor Authentication</p>
-                    <p className="text-sm text-muted-foreground">Require 2FA for all admin users</p>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" defaultChecked className="sr-only peer" />
-                  <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Clock className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium text-foreground">Session Timeout</p>
-                    <p className="text-sm text-muted-foreground">Auto-logout after inactivity</p>
-                  </div>
-                </div>
-                <select className="px-3 py-1.5 bg-muted border border-border rounded-lg text-sm">
-                  <option>30 minutes</option>
-                  <option>1 hour</option>
-                  <option>4 hours</option>
-                  <option>Never</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="border-t border-border pt-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Password Policy</h2>
-              <div className="space-y-3">
-                {[
-                  "Minimum 8 characters",
-                  "Require uppercase letters",
-                  "Require numbers",
-                  "Require special characters",
-                  "Password expiry (90 days)",
-                ].map((policy) => (
-                  <div key={policy} className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-                    <input type="checkbox" defaultChecked className="rounded border-border" />
-                    <span className="text-sm text-foreground">{policy}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="border-t border-border pt-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Data & Privacy</h2>
-              <div className="space-y-3">
-                <Button variant="outline">
-                  <Database className="h-4 w-4 mr-2" />
-                  Export All Data
-                </Button>
-                <Button variant="outline" className="text-destructive ml-2">
-                  Delete All Candidate Data
-                </Button>
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
+  const roleColors: Record<string, string> = {
+    admin: "bg-purple-500/10 text-purple-600",
+    interviewer: "bg-blue-500/10 text-blue-600",
+    recruiter: "bg-green-500/10 text-green-600",
   };
 
   return (
     <ProtectedDashboard allowedRoles={["admin"]}>
       {/* Page Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground mt-1">
-            Configure your recruitment platform settings.
-          </p>
-        </div>
-        {hasChanges && (
-          <Button onClick={handleSave}>
-            <Save className="h-4 w-4 mr-2" />
-            Save Changes
-          </Button>
-        )}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+        <p className="text-muted-foreground mt-1">
+          Configure your recruitment platform settings.
+        </p>
       </div>
 
       <div className="grid grid-cols-4 gap-6">
-        {/* Settings Navigation */}
-        <div className="bg-card rounded-xl border border-border overflow-hidden h-fit">
-          <div className="p-4 border-b border-border">
-            <h2 className="font-semibold text-foreground">Settings</h2>
-          </div>
-          <div className="p-2">
-            {settingsSections.map((section) => {
+        {/* Settings Sidebar */}
+        <div className="bg-card rounded-xl border border-border p-4">
+          <h3 className="font-semibold text-foreground mb-4">Settings</h3>
+          <nav className="space-y-1">
+            {sections.map((section) => {
               const Icon = section.icon;
               return (
                 <button
                   key={section.id}
+                  onClick={() => setActiveSection(section.id)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left",
+                    "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     activeSection === section.id
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
-                  onClick={() => setActiveSection(section.id)}
                 >
                   <Icon className="h-4 w-4" />
-                  <span className="text-sm font-medium">{section.label}</span>
+                  {section.label}
                 </button>
               );
             })}
-          </div>
+          </nav>
         </div>
 
-        {/* Settings Content */}
-        <div className="col-span-3 bg-card rounded-xl border border-border p-6">
-          {renderSettingsContent()}
+        {/* Main Content */}
+        <div className="col-span-3 space-y-6">
+          {activeSection === "users" && (
+            <>
+              {/* Team Members Section */}
+              <div className="bg-card rounded-xl border border-border overflow-hidden">
+                <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold text-foreground">Team Members</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Manage your team members and their roles
+                    </p>
+                  </div>
+                  <Button onClick={handleCreateUser}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add User
+                  </Button>
+                </div>
+
+                {loading ? (
+                  <div className="p-12 flex items-center justify-center">
+                    <LoadingSpinner size="lg" />
+                  </div>
+                ) : (
+                  <table className="w-full">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
+                          User
+                        </th>
+                        <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
+                          Role
+                        </th>
+                        <th className="text-center px-6 py-3 text-sm font-medium text-muted-foreground">
+                          Status
+                        </th>
+                        <th className="text-right px-6 py-3 text-sm font-medium text-muted-foreground">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {users.map((user) => (
+                        <tr key={user.id} className="hover:bg-muted/30 transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold">
+                                {user.name.charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <p className="font-medium text-foreground">{user.name}</p>
+                                <p className="text-sm text-muted-foreground">{user.email}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={cn(
+                                "px-2.5 py-1 rounded-full text-xs font-medium capitalize",
+                                roleColors[user.role]
+                              )}
+                            >
+                              {user.role}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <button
+                              onClick={() => handleToggleStatus(user.id)}
+                              className={cn(
+                                "px-3 py-1 rounded-full text-xs font-medium",
+                                user.isActive
+                                  ? "bg-green-500/10 text-green-600"
+                                  : "bg-gray-500/10 text-gray-600"
+                              )}
+                            >
+                              {user.isActive ? "Active" : "Inactive"}
+                            </button>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditUser(user)}
+                              >
+                                <Pencil className="h-4 w-4 mr-1" />
+                                Edit
+                              </Button>
+                              {deleteConfirm === user.id ? (
+                                <div className="flex items-center gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleDeleteUser(user.id)}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Check className="h-4 w-4 mr-1" />
+                                    Confirm
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setDeleteConfirm(null)}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              ) : (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setDeleteConfirm(user.id)}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-1" />
+                                  Remove
+                                </Button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+
+                {!loading && users.length === 0 && (
+                  <div className="p-12 text-center">
+                    <User className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
+                    <p className="text-muted-foreground">No users found</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {activeSection === "general" && (
+            <div className="bg-card rounded-xl border border-border p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">General Settings</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    defaultValue="Tech Innovations Inc."
+                    className="w-full px-3 py-2 bg-muted border border-border rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">
+                    Time Zone
+                  </label>
+                  <select className="w-full px-3 py-2 bg-muted border border-border rounded-lg">
+                    <option>Asia/Singapore (GMT+8)</option>
+                    <option>America/New_York (GMT-5)</option>
+                    <option>Europe/London (GMT+0)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeSection === "ai" && (
+            <div className="bg-card rounded-xl border border-border p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">AI Configuration</h2>
+              <p className="text-sm text-muted-foreground">Configure AI-powered features</p>
+            </div>
+          )}
+
+          {activeSection === "integrations" && (
+            <div className="bg-card rounded-xl border border-border p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">Integrations</h2>
+              <p className="text-sm text-muted-foreground">Connect external services</p>
+            </div>
+          )}
+
+          {activeSection === "notifications" && (
+            <div className="bg-card rounded-xl border border-border p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">Notification Settings</h2>
+              <p className="text-sm text-muted-foreground">Manage notification preferences</p>
+            </div>
+          )}
+
+          {activeSection === "security" && (
+            <div className="bg-card rounded-xl border border-border p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">Security Settings</h2>
+              <p className="text-sm text-muted-foreground">Configure security options</p>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* User Modal */}
+      {showUserModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-xl border border-border w-full max-w-md">
+            <form onSubmit={handleSubmitUser}>
+              <div className="px-6 py-4 border-b border-border">
+                <h3 className="text-lg font-semibold text-foreground">
+                  {modalMode === "create" ? "Add New User" : "Edit User"}
+                </h3>
+              </div>
+
+              <div className="p-6 space-y-4">
+                {modalMode === "edit" && selectedUser && (
+                  <input type="hidden" name="id" value={selectedUser.id} />
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">
+                    Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    defaultValue={selectedUser?.name || ""}
+                    className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                    placeholder="John Doe"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    defaultValue={selectedUser?.email || ""}
+                    className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                    placeholder="john@company.com"
+                  />
+                </div>
+
+                {modalMode === "create" && (
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">
+                      Password *
+                    </label>
+                    <input
+                      type="password"
+                      name="password"
+                      required={modalMode === "create"}
+                      className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                      placeholder="••••••••"
+                      minLength={8}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Must be at least 8 characters
+                    </p>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">
+                    Role *
+                  </label>
+                  <select
+                    name="role"
+                    required
+                    defaultValue={selectedUser?.role || "recruiter"}
+                    className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                  >
+                    <option value="recruiter">Recruiter</option>
+                    <option value="interviewer">Interviewer</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">
+                    Phone
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    defaultValue={selectedUser?.phone || ""}
+                    className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                    placeholder="+65 9123 4567"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">
+                    Department
+                  </label>
+                  <input
+                    type="text"
+                    name="department"
+                    defaultValue={selectedUser?.department || ""}
+                    className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                    placeholder="Engineering"
+                  />
+                </div>
+
+                {modalMode === "edit" && selectedUser && (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="isActive"
+                      id="isActive"
+                      defaultChecked={selectedUser.isActive}
+                      value="true"
+                      className="rounded border-border"
+                    />
+                    <label htmlFor="isActive" className="text-sm text-foreground">
+                      Active user
+                    </label>
+                  </div>
+                )}
+              </div>
+
+              <div className="px-6 py-4 border-t border-border flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowUserModal(false);
+                    setModalMode(null);
+                    setSelectedUser(null);
+                  }}
+                  disabled={submitting}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={submitting}>
+                  {submitting ? (
+                    <>
+                      <LoadingSpinner size="sm" className="mr-2" />
+                      {modalMode === "create" ? "Creating..." : "Updating..."}
+                    </>
+                  ) : (
+                    modalMode === "create" ? "Create User" : "Update User"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </ProtectedDashboard>
   );
 }

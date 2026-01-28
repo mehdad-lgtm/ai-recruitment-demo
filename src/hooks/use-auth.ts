@@ -35,16 +35,16 @@ export function useAuth(): UseAuthResult {
         const session = await authClient.getSession();
         
         if (session.data?.user) {
-          const userData = session.data.user as AuthUser;
+          const userData = session.data.user as any;
           setUser({
             id: userData.id || "",
             name: userData.name || "User",
             email: userData.email || "",
             role: (userData.role as UserRole) || "recruiter",
-            image: userData.image,
-            phone: userData.phone,
-            department: userData.department,
-            isActive: userData.isActive,
+            image: userData.image || null,
+            phone: userData.phone || null,
+            department: userData.department || null,
+            isActive: userData.isActive ?? true,
           });
         } else {
           setUser(null);
@@ -82,7 +82,6 @@ export function useAuth(): UseAuthResult {
 export function useRequireRole(allowedRoles: UserRole[]) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
-  const [hasAccess, setHasAccess] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
@@ -101,10 +100,10 @@ export function useRequireRole(allowedRoles: UserRole[]) {
         router.push(roleHome[user.role] || "/dashboard");
         return;
       }
-
-      setHasAccess(true);
     }
   }, [isLoading, isAuthenticated, user, allowedRoles, router]);
+
+  const hasAccess = !isLoading && isAuthenticated && user && allowedRoles.includes(user.role);
 
   return { user, isLoading, hasAccess };
 }
