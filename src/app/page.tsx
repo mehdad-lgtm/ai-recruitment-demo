@@ -86,8 +86,8 @@ export default function LoginPage() {
               <div className="inline-flex items-center justify-center p-3 bg-white/10 backdrop-blur-xl rounded-2xl mb-8 border border-white/10 shadow-2xl">
                 <Sparkles className="w-10 h-10 text-primary-foreground" />
               </div>
-              <h1 className="text-5xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
-                Recruit Smarter
+              <h1 className="text-5xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+                AI recruitment Engine
               </h1>
               <p className="text-xl text-slate-300 leading-relaxed font-light">
                 Join thousands of companies using AI to streamline their hiring process and find the perfect candidates.
