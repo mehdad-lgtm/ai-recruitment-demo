@@ -1,8 +1,12 @@
 "use client";
 
+import { useCalendar } from "@/calendar/contexts/calendar-context";
+import type { IEvent } from "@/calendar/types";
+import { getEventColorClasses } from "@/calendar/types";
 import { cn } from "@/lib/utils";
 import {
     addDays,
+    endOfWeek,
     format,
     getHours,
     getMinutes,
@@ -14,24 +18,21 @@ import {
     startOfWeek,
 } from "date-fns";
 import * as React from "react";
-import { useCalendar } from "./calendar-context";
-import type { ICalendarEvent } from "./types";
-import { getEventColorClasses } from "./types";
 
 // Working hours for display (8 AM to 10 PM)
 const WORK_HOURS = Array.from({ length: 15 }, (_, i) => i + 8);
 const HOUR_HEIGHT = 60; // pixels per hour
 
-interface CalendarWeekViewProps {
-  onEventClick?: (event: ICalendarEvent) => void;
-  onTimeSlotClick?: (date: Date, hour: number) => void;
+interface WeekViewProps {
+  onEventClick?: (event: IEvent) => void;
 }
 
-export function CalendarWeekView({ onEventClick, onTimeSlotClick }: CalendarWeekViewProps) {
-  const { selectedDate, getFilteredEvents, visibleHours, workingHours } = useCalendar();
+export function WeekView({ onEventClick }: WeekViewProps) {
+  const { currentDate, getFilteredEvents } = useCalendar();
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
-  const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
+  const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
+  const weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
   const events = getFilteredEvents();
@@ -65,35 +66,6 @@ export function CalendarWeekView({ onEventClick, onTimeSlotClick }: CalendarWeek
     return topPosition;
   }, []);
 
-  const getEventStyle = (event: ICalendarEvent, date: Date) => {
-    const eventStart = parseISO(event.startDate);
-    const eventEnd = parseISO(event.endDate);
-    
-    const startHour = getHours(eventStart);
-    const startMinute = getMinutes(eventStart);
-    const endHour = getHours(eventEnd);
-    const endMinute = getMinutes(eventEnd);
-
-    const topPos = (startHour - 8) * HOUR_HEIGHT + startMinute;
-    const duration = (endHour - startHour) * 60 + (endMinute - startMinute);
-    const height = Math.max((duration / 60) * HOUR_HEIGHT, 30);
-
-    return { top: `${topPos}px`, height: `${height}px` };
-  };
-
-  const getDayEvents = (day: Date) => {
-    return events.filter((e) => {
-      const start = parseISO(e.startDate);
-      return isSameDay(start, day) && !allDayEvents.includes(e);
-    });
-  };
-
-  const isWorkingHour = (hour: number, dayOfWeek: number) => {
-    const dayHours = workingHours[dayOfWeek];
-    if (!dayHours) return false;
-    return hour >= dayHours.from && hour < dayHours.to;
-  };
-
   return (
     <div className="bg-card/60 rounded-2xl border border-border/40 overflow-hidden">
       {/* All-day Events Row */}
@@ -104,14 +76,14 @@ export function CalendarWeekView({ onEventClick, onTimeSlotClick }: CalendarWeek
               <span className="text-xs text-muted-foreground">All day</span>
             </div>
             {weekDays.map((day) => {
-              const dayAllDayEvents = allDayEvents.filter(
+              const dayEvents = allDayEvents.filter(
                 (e) =>
                   isSameDay(parseISO(e.startDate), day) ||
                   (parseISO(e.startDate) <= day && parseISO(e.endDate) >= day)
               );
               return (
-                <div key={day.toISOString()} className="p-1 border-r border-border/40 last:border-r-0 min-h-10">
-                  {dayAllDayEvents.slice(0, 2).map((event) => {
+                <div key={day.toISOString()} className="p-1 border-r border-border/40 last:border-r-0 min-h-[40px]">
+                  {dayEvents.slice(0, 2).map((event) => {
                     const colorClasses = getEventColorClasses(event.color);
                     return (
                       <button
@@ -127,6 +99,9 @@ export function CalendarWeekView({ onEventClick, onTimeSlotClick }: CalendarWeek
                       </button>
                     );
                   })}
+                  {dayEvents.length > 2 && (
+                    <span className="text-xs text-muted-foreground">+{dayEvents.length - 2} more</span>
+                  )}
                 </div>
               );
             })}
@@ -134,105 +109,120 @@ export function CalendarWeekView({ onEventClick, onTimeSlotClick }: CalendarWeek
         </div>
       )}
 
-      {/* Week Days Header */}
-      <div className="grid grid-cols-8 border-b border-border/40">
-        <div className="p-3 border-r border-border/40 w-16" />
+      {/* Week Header */}
+      <div className="grid grid-cols-8 border-b border-border/40 bg-muted/20">
+        <div className="p-3 border-r border-border/40" />
         {weekDays.map((day) => (
           <div
             key={day.toISOString()}
             className={cn(
-              "py-3 text-center border-r border-border/40 last:border-r-0",
+              "p-3 text-center border-r border-border/40 last:border-r-0",
               isToday(day) && "bg-primary/5"
             )}
           >
-            <p className="text-xs text-muted-foreground">{format(day, "EEE")}</p>
-            <p className={cn(
-              "text-lg font-semibold",
-              isToday(day) && "text-primary"
-            )}>
+            <div className="text-sm font-medium">{format(day, "EEE")}</div>
+            <div
+              className={cn(
+                "text-lg font-semibold",
+                isToday(day) &&
+                  "w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto"
+              )}
+            >
               {format(day, "d")}
-            </p>
+            </div>
           </div>
         ))}
       </div>
 
       {/* Time Grid */}
-      <div
-        ref={scrollRef}
-        className="relative overflow-y-auto"
-        style={{ height: "600px" }}
-      >
+      <div ref={scrollRef} className="overflow-y-auto" style={{ height: "600px" }}>
         <div className="grid grid-cols-8" style={{ height: `${WORK_HOURS.length * HOUR_HEIGHT}px` }}>
-          {/* Time Labels */}
-          <div className="border-r border-border/40">
+          {/* Time Column */}
+          <div className="border-r border-border/40 relative">
             {WORK_HOURS.map((hour, idx) => (
               <div
                 key={hour}
-                className="h-15 text-right pr-2 text-xs text-muted-foreground border-b border-border/30 flex items-start pt-1"
+                className="absolute left-0 right-0 border-t border-border/30"
+                style={{ top: `${idx * HOUR_HEIGHT}px`, height: `${HOUR_HEIGHT}px` }}
               >
-                {format(setHours(setMinutes(new Date(), 0), hour), "h a")}
+                <span className="absolute -top-2.5 left-2 text-xs text-muted-foreground bg-card px-1">
+                  {format(setHours(setMinutes(new Date(), 0), hour), "hh a")}
+                </span>
               </div>
             ))}
           </div>
 
           {/* Day Columns */}
-          {weekDays.map((day) => {
-            const dayEvents = getDayEvents(day);
-            const isTodayCol = isToday(day);
+          {weekDays.map((day, dayIdx) => {
+            const dayEvents = events.filter((e) => {
+              const start = parseISO(e.startDate);
+              return isSameDay(start, day) && !allDayEvents.includes(e);
+            });
 
             return (
               <div
                 key={day.toISOString()}
                 className={cn(
                   "relative border-r border-border/40 last:border-r-0",
-                  isTodayCol && "bg-primary/5"
+                  isToday(day) && "bg-primary/5"
                 )}
               >
-                {/* Hour Slots */}
-                {WORK_HOURS.map((hour) => (
+                {/* Hour Lines */}
+                {WORK_HOURS.map((_, idx) => (
                   <div
-                    key={hour}
-                    className={cn(
-                      "h-15 border-b border-border/30 cursor-pointer hover:bg-muted/30 transition-colors",
-                      !isWorkingHour(hour, day.getDay()) && "bg-muted/10"
-                    )}
-                    onClick={() => onTimeSlotClick?.(day, hour)}
+                    key={idx}
+                    className="absolute left-0 right-0 border-t border-border/30"
+                    style={{ top: `${idx * HOUR_HEIGHT}px` }}
                   />
                 ))}
 
                 {/* Current Time Indicator */}
-                {isTodayCol && currentTimeIndicator !== null && (
+                {isToday(day) && currentTimeIndicator !== null && (
                   <div
-                    className="absolute left-0 right-0 z-20 flex items-center pointer-events-none"
+                    className="absolute left-0 right-0 z-20"
                     style={{ top: `${currentTimeIndicator}px` }}
                   >
-                    <div className="w-2 h-2 rounded-full bg-rose-500" />
-                    <div className="flex-1 h-0.5 bg-rose-500" />
+                    <div className="h-0.5 bg-rose-500 relative">
+                      <div className="absolute -left-1 -top-1 w-2 h-2 rounded-full bg-rose-500" />
+                    </div>
                   </div>
                 )}
 
                 {/* Events */}
                 {dayEvents.map((event) => {
-                  const style = getEventStyle(event, day);
+                  const start = parseISO(event.startDate);
+                  const end = parseISO(event.endDate);
+                  const startHour = getHours(start);
+                  const startMinute = getMinutes(start);
+                  const endHour = getHours(end);
+                  const endMinute = getMinutes(end);
+
+                  const topPos = (startHour - 8) * HOUR_HEIGHT + startMinute;
+                  const duration = (endHour - startHour) * HOUR_HEIGHT + endMinute - startMinute;
+                  const height = Math.max(duration, 25);
+
                   const colorClasses = getEventColorClasses(event.color);
+
                   return (
                     <button
                       key={event.id}
+                      onClick={() => onEventClick?.(event)}
                       className={cn(
-                        "absolute left-1 right-1 rounded-lg p-1.5 text-left transition-all hover:shadow-lg hover:scale-[1.02] cursor-pointer overflow-hidden",
+                        "absolute left-1 right-1 rounded-md p-1.5 text-left transition-all hover:shadow-lg hover:z-10 cursor-pointer overflow-hidden",
                         colorClasses.bg,
                         colorClasses.text
                       )}
-                      style={style}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEventClick?.(event);
+                      style={{
+                        top: `${topPos}px`,
+                        height: `${height}px`,
                       }}
                     >
-                      <p className="truncate font-medium text-xs">{event.title}</p>
-                      <p className="truncate text-[10px] opacity-90">
-                        {format(parseISO(event.startDate), "h:mm a")}
-                      </p>
+                      <div className="font-medium text-xs truncate">{event.title}</div>
+                      {height > 35 && (
+                        <div className="text-[10px] opacity-90">
+                          {format(start, "h:mm a")} - {format(end, "h:mm a")}
+                        </div>
+                      )}
                     </button>
                   );
                 })}

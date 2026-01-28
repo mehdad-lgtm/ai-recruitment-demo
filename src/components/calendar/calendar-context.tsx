@@ -1,10 +1,11 @@
 "use client";
 
-import { createContext, useContext, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import type {
     ICalendarEvent,
     ICalendarUser,
     TBadgeVariant,
+    TCalendarView,
     TVisibleHours,
     TWorkingHours
 } from "./types";
@@ -14,6 +15,8 @@ interface ICalendarContext {
   setSelectedDate: (date: Date | undefined) => void;
   selectedUserId: string | "all";
   setSelectedUserId: (userId: string | "all") => void;
+  currentView: TCalendarView;
+  setCurrentView: (view: TCalendarView) => void;
   badgeVariant: TBadgeVariant;
   setBadgeVariant: (variant: TBadgeVariant) => void;
   users: ICalendarUser[];
@@ -23,6 +26,11 @@ interface ICalendarContext {
   setVisibleHours: Dispatch<SetStateAction<TVisibleHours>>;
   events: ICalendarEvent[];
   setEvents: Dispatch<SetStateAction<ICalendarEvent[]>>;
+  // New methods
+  addEvent: (event: ICalendarEvent) => void;
+  updateEvent: (id: string, updates: Partial<ICalendarEvent>) => void;
+  deleteEvent: (id: string) => void;
+  getFilteredEvents: () => ICalendarEvent[];
 }
 
 const CalendarContext = createContext<ICalendarContext | null>(null);
@@ -46,6 +54,7 @@ interface CalendarProviderProps {
   initialUsers?: ICalendarUser[];
   initialEvents?: ICalendarEvent[];
   initialDate?: Date;
+  initialView?: TCalendarView;
   initialWorkingHours?: { start: number; end: number };
   initialVisibleHours?: { start: number; end: number };
 }
@@ -57,41 +66,68 @@ export function CalendarProvider({
   events: initialEventsLegacy,
   initialEvents: initialEventsProp,
   initialDate,
+  initialView = "month",
   initialWorkingHours,
   initialVisibleHours
 }: CalendarProviderProps) {
   const [badgeVariant, setBadgeVariant] = useState<TBadgeVariant>("colored");
+  const [currentView, setCurrentView] = useState<TCalendarView>(initialView);
   const [visibleHours, setVisibleHours] = useState<TVisibleHours>(initialVisibleHours ? { from: initialVisibleHours.start, to: initialVisibleHours.end } : DEFAULT_VISIBLE_HOURS);
   const [workingHours, setWorkingHours] = useState<TWorkingHours>(initialWorkingHours ? { ...DEFAULT_WORKING_HOURS, 1: { from: initialWorkingHours.start, to: initialWorkingHours.end }, 2: { from: initialWorkingHours.start, to: initialWorkingHours.end }, 3: { from: initialWorkingHours.start, to: initialWorkingHours.end }, 4: { from: initialWorkingHours.start, to: initialWorkingHours.end }, 5: { from: initialWorkingHours.start, to: initialWorkingHours.end } } : DEFAULT_WORKING_HOURS);
   const [selectedDate, setSelectedDateState] = useState(initialDate || new Date());
   const [selectedUserId, setSelectedUserId] = useState<string | "all">("all");
   const initialEvents = initialEventsProp || initialEventsLegacy || [];
   const [events, setEvents] = useState<ICalendarEvent[]>(initialEvents);
-  const calendarUsers = initialUsers || users || [];
+  const calendarUsers = useMemo(() => initialUsers || users || [], [initialUsers, users]);
 
   const handleSelectDate = (date: Date | undefined) => {
     if (!date) return;
     setSelectedDateState(date);
   };
 
+  const addEvent = useCallback((event: ICalendarEvent) => {
+    setEvents((prev) => [...prev, event]);
+  }, []);
+
+  const updateEvent = useCallback((id: string, updates: Partial<ICalendarEvent>) => {
+    setEvents((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
+    );
+  }, []);
+
+  const deleteEvent = useCallback((id: string) => {
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+  }, []);
+
+  const getFilteredEvents = useCallback(() => {
+    if (selectedUserId === "all") return events;
+    return events.filter((e) => e.user?.id === selectedUserId);
+  }, [events, selectedUserId]);
+
+  const value = useMemo(() => ({
+    selectedDate,
+    setSelectedDate: handleSelectDate,
+    selectedUserId,
+    setSelectedUserId,
+    currentView,
+    setCurrentView,
+    badgeVariant,
+    setBadgeVariant,
+    users: calendarUsers,
+    visibleHours,
+    setVisibleHours,
+    workingHours,
+    setWorkingHours,
+    events,
+    setEvents,
+    addEvent,
+    updateEvent,
+    deleteEvent,
+    getFilteredEvents,
+  }), [selectedDate, selectedUserId, currentView, badgeVariant, calendarUsers, visibleHours, workingHours, events, addEvent, updateEvent, deleteEvent, getFilteredEvents]);
+
   return (
-    <CalendarContext.Provider
-      value={{
-        selectedDate,
-        setSelectedDate: handleSelectDate,
-        selectedUserId,
-        setSelectedUserId,
-        badgeVariant,
-        setBadgeVariant,
-        users: calendarUsers,
-        visibleHours,
-        setVisibleHours,
-        workingHours,
-        setWorkingHours,
-        events,
-        setEvents,
-      }}
-    >
+    <CalendarContext.Provider value={value}>
       {children}
     </CalendarContext.Provider>
   );

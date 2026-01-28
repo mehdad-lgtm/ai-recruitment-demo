@@ -1,45 +1,42 @@
 "use client";
 
+import { useCalendar } from "@/calendar/contexts/calendar-context";
+import type { IEvent } from "@/calendar/types";
+import { getEventColorClasses } from "@/calendar/types";
 import { cn } from "@/lib/utils";
 import {
     addDays,
+    endOfMonth,
     format,
     isSameDay,
     isSameMonth,
     isToday,
     parseISO,
     startOfMonth,
-    startOfWeek
+    startOfWeek,
 } from "date-fns";
-import { useMemo } from "react";
-import { useCalendar } from "./calendar-context";
-import type { ICalendarEvent } from "./types";
-import { getEventColorClasses } from "./types";
 
-const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-interface CalendarMonthViewProps {
-  onEventClick?: (event: ICalendarEvent) => void;
+interface MonthViewProps {
+  onEventClick?: (event: IEvent) => void;
   onDayClick?: (date: Date) => void;
 }
 
-export function CalendarMonthView({ onEventClick, onDayClick }: CalendarMonthViewProps) {
-  const { selectedDate, setSelectedDate, getFilteredEvents, setCurrentView } = useCalendar();
+export function MonthView({ onEventClick, onDayClick }: MonthViewProps) {
+  const { currentDate, getFilteredEvents, setCurrentDate, setCurrentView } = useCalendar();
 
   const events = getFilteredEvents();
 
-  const calendarData = useMemo(() => {
-    const monthStart = startOfMonth(selectedDate);
-    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+  const monthStart = startOfMonth(currentDate);
+  const monthEnd = endOfMonth(currentDate);
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
 
-    // Generate 6 weeks of days
-    const days = Array.from({ length: 42 }, (_, i) => addDays(calendarStart, i));
+  // Generate 6 weeks of days
+  const days = Array.from({ length: 42 }, (_, i) => addDays(calendarStart, i));
 
-    return { monthStart, days };
-  }, [selectedDate]);
+  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const handleDayClick = (date: Date) => {
-    setSelectedDate(date);
+    setCurrentDate(date);
     if (onDayClick) {
       onDayClick(date);
     } else {
@@ -47,15 +44,11 @@ export function CalendarMonthView({ onEventClick, onDayClick }: CalendarMonthVie
     }
   };
 
-  const getDayEvents = (day: Date) => {
-    return events.filter((e) => isSameDay(parseISO(e.startDate), day));
-  };
-
   return (
     <div className="bg-card/60 rounded-2xl border border-border/40 overflow-hidden">
       {/* Week Day Headers */}
       <div className="grid grid-cols-7 border-b border-border/40 bg-muted/20">
-        {WEEK_DAYS.map((day) => (
+        {weekDays.map((day) => (
           <div
             key={day}
             className="p-3 text-center text-sm font-semibold text-muted-foreground border-r border-border/40 last:border-r-0"
@@ -67,10 +60,10 @@ export function CalendarMonthView({ onEventClick, onDayClick }: CalendarMonthVie
 
       {/* Calendar Grid */}
       <div className="grid grid-cols-7">
-        {calendarData.days.map((day, idx) => {
-          const isCurrentMonth = isSameMonth(day, selectedDate);
+        {days.map((day, idx) => {
+          const isCurrentMonth = isSameMonth(day, currentDate);
           const isTodayDate = isToday(day);
-          const dayEvents = getDayEvents(day);
+          const dayEvents = events.filter((e) => isSameDay(parseISO(e.startDate), day));
           const displayEvents = dayEvents.slice(0, 3);
           const remainingCount = dayEvents.length - 3;
 
@@ -78,7 +71,7 @@ export function CalendarMonthView({ onEventClick, onDayClick }: CalendarMonthVie
             <div
               key={idx}
               className={cn(
-                "min-h-30 border-r border-b border-border/40 last:border-r-0 p-1 transition-colors",
+                "min-h-[120px] border-r border-b border-border/40 last:border-r-0 p-1 transition-colors",
                 !isCurrentMonth && "bg-muted/30",
                 isTodayDate && "bg-primary/5"
               )}

@@ -68,7 +68,7 @@ export function AdminViewSwitcher() {
             key={view.role}
             onClick={() => handleViewSwitch(view)}
             className={cn(
-              "relative flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-lg transition-colors duration-300 z-10",
+              "relative flex flex-col items-center justify-center gap-1 py-1.5 px-2 rounded-lg transition-colors duration-300 z-10 whitespace-nowrap",
               isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -83,7 +83,7 @@ export function AdminViewSwitcher() {
               "h-4 w-4 transition-transform duration-300",
               isActive ? "scale-110" : "scale-100 group-hover:scale-110"
             )} />
-            <span className="text-[10px] font-bold uppercase tracking-widest leading-none">
+            <span className="text-[9px] font-semibold uppercase tracking-tight leading-none">
               {view.role}
             </span>
           </button>

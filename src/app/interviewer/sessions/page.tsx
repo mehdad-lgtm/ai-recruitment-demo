@@ -1,9 +1,8 @@
 "use client";
 
 import {
-    CalendarMonthView,
+    CalendarContainer,
     CalendarProvider,
-    CalendarWeekView,
     type ICalendarEvent,
     type ICalendarUser
 } from "@/components/calendar";
@@ -22,7 +21,9 @@ import { useState } from "react";
 
 // Mock data - replace with real API calls
 const mockUsers: ICalendarUser[] = [
-  { id: "int-001", name: "Current User", picturePath: null },
+  { id: "int-001", name: "Leonardo Ramos", picturePath: null },
+  { id: "int-002", name: "Michael Doe", picturePath: null },
+  { id: "int-003", name: "Alice Johnson", picturePath: null },
 ];
 
 const mockSessions: ICalendarEvent[] = [
@@ -45,7 +46,7 @@ const mockSessions: ICalendarEvent[] = [
     startDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(Date.now() + 2.75 * 60 * 60 * 1000).toISOString(),
     color: "green",
-    user: mockUsers[0],
+    user: mockUsers[1],
     sessionType: "in-person",
     candidateId: "c-002",
     status: "scheduled",
@@ -57,7 +58,7 @@ const mockSessions: ICalendarEvent[] = [
     startDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(Date.now() + 24.5 * 60 * 60 * 1000).toISOString(),
     color: "purple",
-    user: mockUsers[0],
+    user: mockUsers[2],
     sessionType: "video",
     candidateId: "c-003",
     status: "scheduled",
@@ -72,6 +73,30 @@ const mockSessions: ICalendarEvent[] = [
     user: mockUsers[0],
     sessionType: "phone",
     candidateId: "c-004",
+    status: "scheduled",
+  },
+  {
+    id: "s-005",
+    title: "Technical Screening - Anna Lee",
+    description: "Frontend Developer position",
+    startDate: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
+    endDate: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+    color: "teal",
+    user: mockUsers[1],
+    sessionType: "video",
+    candidateId: "c-005",
+    status: "scheduled",
+  },
+  {
+    id: "s-006",
+    title: "HR Interview - Tom Wilson",
+    description: "Backend Developer position",
+    startDate: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
+    endDate: new Date(Date.now() + 5.75 * 60 * 60 * 1000).toISOString(),
+    color: "pink",
+    user: mockUsers[2],
+    sessionType: "video",
+    candidateId: "c-006",
     status: "scheduled",
   },
 ];
@@ -111,7 +136,6 @@ const upcomingSessions = [
 
 export default function SessionsPage() {
   const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
-  const [calendarView, setCalendarView] = useState<"month" | "week">("week");
 
   return (
     <ProtectedDashboard allowedRoles={["admin", "interviewer"]}>
@@ -151,39 +175,9 @@ export default function SessionsPage() {
 
       {viewMode === "calendar" ? (
         <>
-          {/* Calendar View Toggles */}
-          <div className="mb-4 flex gap-2">
-            <Button
-              variant={calendarView === "week" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setCalendarView("week")}
-            >
-              Week View
-            </Button>
-            <Button
-              variant={calendarView === "month" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setCalendarView("month")}
-            >
-              Month View
-            </Button>
-          </div>
-
-          {/* Calendar */}
+          {/* Calendar with Full Toolbar */}
           <CalendarProvider users={mockUsers} events={mockSessions}>
-            {calendarView === "week" ? (
-              <CalendarWeekView
-                onEventClick={(event) => {
-                  console.log("Event clicked:", event);
-                }}
-              />
-            ) : (
-              <CalendarMonthView
-                onEventClick={(event) => {
-                  console.log("Event clicked:", event);
-                }}
-              />
-            )}
+            <CalendarContainer />
           </CalendarProvider>
         </>
       ) : (

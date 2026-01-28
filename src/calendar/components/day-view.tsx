@@ -1,5 +1,8 @@
 "use client";
 
+import { useCalendar } from "@/calendar/contexts/calendar-context";
+import type { IEvent } from "@/calendar/types";
+import { getEventColorClasses } from "@/calendar/types";
 import { cn } from "@/lib/utils";
 import {
     addMonths,
@@ -16,78 +19,52 @@ import {
 } from "date-fns";
 import { Calendar, ChevronLeft, ChevronRight, Clock, User } from "lucide-react";
 import * as React from "react";
-import { useCalendar } from "./calendar-context";
-import type { ICalendarEvent } from "./types";
-import { getEventColorClasses } from "./types";
 
 // Working hours for display (8 AM to 9 PM)
 const WORK_HOURS = Array.from({ length: 14 }, (_, i) => i + 8);
 
-interface CalendarDayViewProps {
-  onEventClick?: (event: ICalendarEvent) => void;
-  onTimeSlotClick?: (date: Date, hour: number) => void;
+interface DayViewProps {
+  onEventClick?: (event: IEvent) => void;
 }
 
-export function CalendarDayView({ onEventClick, onTimeSlotClick }: CalendarDayViewProps) {
-  const { selectedDate, setSelectedDate, getFilteredEvents, workingHours } = useCalendar();
+export function DayView({ onEventClick }: DayViewProps) {
+  const { currentDate, getFilteredEvents, setCurrentDate } = useCalendar();
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
   const events = getFilteredEvents().filter((e) =>
-    isSameDay(parseISO(e.startDate), selectedDate)
+    isSameDay(parseISO(e.startDate), currentDate)
   );
 
   // Scroll to current time on mount
   React.useEffect(() => {
-    if (scrollRef.current && isToday(selectedDate)) {
+    if (scrollRef.current && isToday(currentDate)) {
       const now = new Date();
       const hours = now.getHours();
       const scrollPosition = (hours - 8) * 60; // 60px per hour
       scrollRef.current.scrollTop = Math.max(0, scrollPosition - 100);
     }
-  }, [selectedDate]);
+  }, [currentDate]);
 
   const currentTimeIndicator = React.useMemo(() => {
-    if (!isToday(selectedDate)) return null;
+    if (!isToday(currentDate)) return null;
     const now = new Date();
     const hours = now.getHours();
     const minutes = now.getMinutes();
     if (hours < 8 || hours > 21) return null;
     const topPosition = ((hours - 8) * 60) + minutes;
     return topPosition;
-  }, [selectedDate]);
+  }, [currentDate]);
 
   // Get the current event happening now
   const currentEvent = React.useMemo(() => {
     const now = new Date();
-    if (!isToday(selectedDate)) return null;
+    if (!isToday(currentDate)) return null;
     return events.find((e) => {
       const start = parseISO(e.startDate);
       const end = parseISO(e.endDate);
       return now >= start && now <= end;
     });
-  }, [events, selectedDate]);
-
-  const getEventStyle = (event: ICalendarEvent) => {
-    const start = parseISO(event.startDate);
-    const end = parseISO(event.endDate);
-    const startHour = getHours(start);
-    const startMinute = getMinutes(start);
-    const endHour = getHours(end);
-    const endMinute = getMinutes(end);
-
-    const topPos = (startHour - 8) * 60 + startMinute;
-    const duration = (endHour - startHour) * 60 + (endMinute - startMinute);
-    const height = Math.max(duration, 30);
-
-    return { top: `${topPos}px`, height: `${height}px` };
-  };
-
-  const isWorkingHour = (hour: number) => {
-    const dayOfWeek = selectedDate.getDay();
-    const dayHours = workingHours[dayOfWeek];
-    if (!dayHours) return false;
-    return hour >= dayHours.from && hour < dayHours.to;
-  };
+  }, [events, currentDate]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
@@ -96,10 +73,7 @@ export function CalendarDayView({ onEventClick, onTimeSlotClick }: CalendarDayVi
         {/* Day Header */}
         <div className="p-4 border-b border-border/40 bg-muted/20">
           <div className="text-lg font-semibold">
-            {format(selectedDate, "EEEE, MMMM d")}
-          </div>
-          <div className="text-sm text-muted-foreground">
-            {events.length} event{events.length !== 1 ? "s" : ""} scheduled
+            {format(currentDate, "EEE d")}
           </div>
         </div>
 
@@ -114,19 +88,12 @@ export function CalendarDayView({ onEventClick, onTimeSlotClick }: CalendarDayVi
             {WORK_HOURS.map((hour, idx) => (
               <div
                 key={hour}
-                className={cn(
-                  "absolute left-0 right-0 border-t border-border/30 flex",
-                  !isWorkingHour(hour) && "bg-muted/10"
-                )}
-                style={{ top: `${idx * 60}px`, height: "60px" }}
+                className="absolute left-0 right-0 border-t border-border/30"
+                style={{ top: `${idx * 60}px` }}
               >
-                <div className="w-16 text-right pr-2 text-xs text-muted-foreground pt-1">
-                  {format(setHours(setMinutes(new Date(), 0), hour), "h a")}
+                <div className="absolute -top-3 left-2 text-xs text-muted-foreground bg-card px-1">
+                  {format(setHours(setMinutes(new Date(), 0), hour), "hh a")}
                 </div>
-                <div 
-                  className="flex-1 cursor-pointer hover:bg-muted/20 transition-colors"
-                  onClick={() => onTimeSlotClick?.(selectedDate, hour)}
-                />
               </div>
             ))}
 
@@ -136,20 +103,28 @@ export function CalendarDayView({ onEventClick, onTimeSlotClick }: CalendarDayVi
                 className="absolute left-0 right-0 z-20 flex items-center"
                 style={{ top: `${currentTimeIndicator}px` }}
               >
-                <div className="w-16 flex justify-end pr-1">
-                  <span className="text-xs text-rose-500 bg-card px-1 font-medium">
-                    {format(new Date(), "h:mm")}
-                  </span>
-                </div>
                 <div className="w-2 h-2 rounded-full bg-rose-500" />
                 <div className="flex-1 h-0.5 bg-rose-500" />
+                <span className="text-xs text-rose-500 bg-card px-1 font-medium">
+                  {format(new Date(), "h:mm a")}
+                </span>
               </div>
             )}
 
             {/* Events */}
             <div className="absolute left-16 right-4 top-0 bottom-0">
               {events.map((event) => {
-                const style = getEventStyle(event);
+                const start = parseISO(event.startDate);
+                const end = parseISO(event.endDate);
+                const startHour = getHours(start);
+                const startMinute = getMinutes(start);
+                const endHour = getHours(end);
+                const endMinute = getMinutes(end);
+
+                const topPos = (startHour - 8) * 60 + startMinute;
+                const duration = (endHour - startHour) * 60 + (endMinute - startMinute);
+                const height = Math.max(duration, 30);
+
                 const colorClasses = getEventColorClasses(event.color);
 
                 return (
@@ -161,11 +136,14 @@ export function CalendarDayView({ onEventClick, onTimeSlotClick }: CalendarDayVi
                       colorClasses.bg,
                       colorClasses.text
                     )}
-                    style={style}
+                    style={{
+                      top: `${topPos}px`,
+                      height: `${height}px`,
+                    }}
                   >
                     <div className="font-medium text-sm truncate">{event.title}</div>
                     <div className="text-xs opacity-90">
-                      {format(parseISO(event.startDate), "h:mm a")} - {format(parseISO(event.endDate), "h:mm a")}
+                      {format(start, "h:mm a")} - {format(end, "h:mm a")}
                     </div>
                   </button>
                 );
@@ -209,48 +187,37 @@ export function CalendarDayView({ onEventClick, onTimeSlotClick }: CalendarDayVi
             </div>
           </div>
         )}
-
-        {/* Day Summary */}
-        <div className="bg-card/60 rounded-2xl border border-border/40 p-4">
-          <h3 className="text-sm font-semibold text-foreground mb-3">
-            Day Summary
-          </h3>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Total events</span>
-              <span className="font-medium text-foreground">{events.length}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Working hours</span>
-              <span className="font-medium text-foreground">
-                {workingHours[selectedDate.getDay()]?.from || 0}:00 - {workingHours[selectedDate.getDay()]?.to || 0}:00
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
 }
 
 function MiniCalendar() {
-  const { selectedDate, setSelectedDate } = useCalendar();
-  const [viewDate, setViewDate] = React.useState(startOfMonth(selectedDate));
+  const { currentDate, setCurrentDate } = useCalendar();
+  const [viewDate, setViewDate] = React.useState(startOfMonth(currentDate));
 
   const daysInMonth = React.useMemo(() => {
     const start = startOfMonth(viewDate);
+    const days: Date[] = [];
     const startDay = start.getDay();
-    const daysInCurrentMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
-    const days: (Date | null)[] = [];
 
-    // Add empty days for the start of the month
-    for (let i = 0; i < startDay; i++) {
-      days.push(null);
+    // Previous month days
+    for (let i = startDay - 1; i >= 0; i--) {
+      const d = new Date(start);
+      d.setDate(d.getDate() - i - 1);
+      days.push(d);
     }
 
-    // Add all days in the month
-    for (let i = 1; i <= daysInCurrentMonth; i++) {
+    // Current month days
+    const monthDays = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+    for (let i = 1; i <= monthDays; i++) {
       days.push(new Date(viewDate.getFullYear(), viewDate.getMonth(), i));
+    }
+
+    // Next month days to fill the grid
+    const remaining = 42 - days.length;
+    for (let i = 1; i <= remaining; i++) {
+      days.push(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, i));
     }
 
     return days;
@@ -259,17 +226,17 @@ function MiniCalendar() {
   return (
     <div className="bg-card/60 rounded-2xl border border-border/40 p-4">
       <div className="flex items-center justify-between mb-4">
-        <span className="text-sm font-medium">{format(viewDate, "MMMM yyyy")}</span>
+        <h4 className="font-semibold text-sm">{format(viewDate, "MMMM yyyy")}</h4>
         <div className="flex items-center gap-1">
           <button
             onClick={() => setViewDate(subMonths(viewDate, 1))}
-            className="p-1 hover:bg-muted/60 rounded transition-colors"
+            className="p-1 hover:bg-muted/60 rounded-md transition-colors"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
           <button
             onClick={() => setViewDate(addMonths(viewDate, 1))}
-            className="p-1 hover:bg-muted/60 rounded transition-colors"
+            className="p-1 hover:bg-muted/60 rounded-md transition-colors"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -277,29 +244,29 @@ function MiniCalendar() {
       </div>
 
       <div className="grid grid-cols-7 gap-1 text-center">
-        {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-          <div key={i} className="text-[10px] text-muted-foreground font-medium py-1">
-            {d}
+        {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+          <div key={day} className="text-xs text-muted-foreground py-1">
+            {day}
           </div>
         ))}
-        {daysInMonth.map((day, idx) => {
-          if (!day) {
-            return <div key={idx} className="w-6 h-6" />;
-          }
-          const isSelected = isSameDay(day, selectedDate);
-          const isTodayDate = isToday(day);
+        {daysInMonth.map((date, idx) => {
+          const isCurrentMonth = date.getMonth() === viewDate.getMonth();
+          const isSelected = isSameDay(date, currentDate);
+          const isTodayDate = isToday(date);
+
           return (
             <button
               key={idx}
-              onClick={() => setSelectedDate(day)}
+              onClick={() => setCurrentDate(date)}
               className={cn(
-                "w-6 h-6 text-xs rounded-full flex items-center justify-center transition-colors",
+                "text-xs py-1.5 rounded-md transition-colors",
+                !isCurrentMonth && "text-muted-foreground/50",
                 isSelected && "bg-primary text-primary-foreground",
-                isTodayDate && !isSelected && "bg-muted text-foreground font-medium",
-                !isSelected && !isTodayDate && "hover:bg-muted/60"
+                isTodayDate && !isSelected && "bg-muted text-foreground font-semibold",
+                isCurrentMonth && !isSelected && !isTodayDate && "hover:bg-muted/60"
               )}
             >
-              {format(day, "d")}
+              {date.getDate()}
             </button>
           );
         })}
