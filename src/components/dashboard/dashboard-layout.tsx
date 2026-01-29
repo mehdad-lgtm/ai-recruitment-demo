@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BarChart3,
-  Bell,
   Calendar,
   ChevronDown,
   Home,
@@ -24,6 +23,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
 import { AdminViewSwitcher } from "./admin-view-switcher";
+import { NotificationPopover } from "./notification-popover";
 
 interface NavItem {
   label: string;
@@ -263,10 +263,7 @@ export function DashboardLayout({
 
             <div className="flex items-center gap-3">
               <ThemeToggle />
-              <button className="p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-background"></span>
-              </button>
+              <NotificationPopover />
               <div className="text-sm font-medium hidden sm:block text-muted-foreground">
                 {new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
               </div>

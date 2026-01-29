@@ -4,6 +4,13 @@ import { createUser, deleteUser, getAllUsers, toggleUserStatus, updateUser, type
 import { ProtectedDashboard } from "@/components/dashboard";
 import { LoadingSpinner } from "@/components/ui";
 import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import {
     Bell,
@@ -338,14 +345,19 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Time Zone
                   </label>
-                  <select className="w-full px-3 py-2 bg-muted border border-border rounded-lg">
-                    <option>Asia/Singapore (GMT+8)</option>
-                    <option>America/New_York (GMT-5)</option>
-                    <option>Europe/London (GMT+0)</option>
-                  </select>
+                  <Select defaultValue="asia-singapore">
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select timezone" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="asia-singapore">Asia/Singapore (GMT+8)</SelectItem>
+                      <SelectItem value="america-new-york">America/New_York (GMT-5)</SelectItem>
+                      <SelectItem value="europe-london">Europe/London (GMT+0)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>
@@ -445,19 +457,23 @@ export default function SettingsPage() {
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Role *
                   </label>
-                  <select
+                  <Select
                     name="role"
-                    required
                     defaultValue={selectedUser?.role || "recruiter"}
-                    className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                    required
                   >
-                    <option value="recruiter">Recruiter</option>
-                    <option value="interviewer">Interviewer</option>
-                    <option value="admin">Admin</option>
-                  </select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="recruiter">Recruiter</SelectItem>
+                      <SelectItem value="interviewer">Interviewer</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div>
