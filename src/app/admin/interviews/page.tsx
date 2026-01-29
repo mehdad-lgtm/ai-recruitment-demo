@@ -203,44 +203,46 @@ export default function AdminInterviewsPage() {
   return (
     <ProtectedDashboard allowedRoles={["admin"]}>
       {/* Page Header */}
-      <div className="flex flex-col gap-4 mb-6 sm:mb-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Interview Sessions</h1>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            Manage and monitor all interview sessions across the organization.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center bg-muted rounded-lg p-1">
-            <button
-              className={cn(
-                "px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors",
-                view === "calendar"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              onClick={() => setView("calendar")}
-            >
-              <Calendar className="h-4 w-4 inline-block mr-1" />
-              Calendar
-            </button>
-            <button
-              className={cn(
-                "px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors",
-                view === "list"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              onClick={() => setView("list")}
-            >
-              <List className="h-4 w-4 inline-block mr-1" />
-              List
-            </button>
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Interview Sessions</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
+              Manage and monitor all interview sessions across the organization.
+            </p>
           </div>
-          <Button onClick={() => setShowScheduleModal(true)} className="text-xs sm:text-sm">
-            <Plus className="h-4 w-4 mr-1 sm:mr-2" />
-            <span className="hidden xs:inline">Schedule</span> Interview
-          </Button>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="flex items-center bg-muted rounded-lg p-1">
+              <button
+                className={cn(
+                  "px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors",
+                  view === "calendar"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                onClick={() => setView("calendar")}
+              >
+                <Calendar className="h-4 w-4 inline-block mr-1" />
+                <span className="hidden sm:inline">Calendar</span>
+              </button>
+              <button
+                className={cn(
+                  "px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors",
+                  view === "list"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                onClick={() => setView("list")}
+              >
+                <List className="h-4 w-4 inline-block mr-1" />
+                <span className="hidden sm:inline">List</span>
+              </button>
+            </div>
+            <Button onClick={() => setShowScheduleModal(true)} className="text-xs sm:text-sm">
+              <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden xs:inline">Schedule</span> Interview
+            </Button>
+          </div>
         </div>
       </div>
 

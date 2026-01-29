@@ -96,37 +96,39 @@ export default function AdminAnalyticsPage() {
   return (
     <ProtectedDashboard allowedRoles={["admin"]}>
       {/* Page Header */}
-      <div className="flex flex-col gap-4 mb-6 sm:mb-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Analytics</h1>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            Track recruitment metrics and performance insights.
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <ScrollArea className="w-full sm:w-auto">
-            <div className="flex items-center bg-muted rounded-lg p-1 min-w-max">
-              {timeRanges.slice(0, 4).map((range) => (
-                <button
-                  key={range}
-                  className={cn(
-                    "px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap",
-                    selectedTimeRange === range
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                  onClick={() => setSelectedTimeRange(range)}
-                >
-                  {range}
-                </button>
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-          <Button variant="outline" size="sm" className="text-xs sm:text-sm shrink-0">
-            <Download className="h-4 w-4 mr-1 sm:mr-2" />
-            Export Report
-          </Button>
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Analytics</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
+              Track recruitment metrics and performance insights.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <ScrollArea className="w-full sm:w-auto">
+              <div className="flex items-center bg-muted rounded-lg p-1 min-w-max">
+                {timeRanges.slice(0, 4).map((range) => (
+                  <button
+                    key={range}
+                    className={cn(
+                      "px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors whitespace-nowrap",
+                      selectedTimeRange === range
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                    onClick={() => setSelectedTimeRange(range)}
+                  >
+                    {range}
+                  </button>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm shrink-0">
+              <Download className="h-4 w-4 mr-1 sm:mr-2" />
+              Export Report
+            </Button>
+          </div>
         </div>
       </div>
 
