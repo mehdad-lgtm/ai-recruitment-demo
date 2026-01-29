@@ -118,58 +118,62 @@ export default function CommunicationsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4 mb-8">
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className={cn("p-2 rounded-lg", channelColors.whatsapp)}>
-              <MessageSquare className="h-4 w-4" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+            <div className={cn("p-1.5 sm:p-2 rounded-lg", channelColors.whatsapp)}>
+              <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
-            <span className="text-sm text-muted-foreground">WhatsApp</span>
+            <span className="text-xs sm:text-sm text-muted-foreground">WhatsApp</span>
           </div>
-          <p className="text-2xl font-bold text-foreground">
+          <p className="text-xl sm:text-2xl font-bold text-foreground">
             {mockMessages.filter((m) => m.channel === "whatsapp").length}
           </p>
         </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className={cn("p-2 rounded-lg", channelColors.voice)}>
-              <Phone className="h-4 w-4" />
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+            <div className={cn("p-1.5 sm:p-2 rounded-lg", channelColors.voice)}>
+              <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
-            <span className="text-sm text-muted-foreground">Voice Calls</span>
+            <span className="text-xs sm:text-sm text-muted-foreground">Voice Calls</span>
           </div>
-          <p className="text-2xl font-bold text-foreground">
+          <p className="text-xl sm:text-2xl font-bold text-foreground">
             {mockMessages.filter((m) => m.channel === "voice").length}
           </p>
         </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className={cn("p-2 rounded-lg", channelColors.email)}>
-              <Mail className="h-4 w-4" />
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+            <div className={cn("p-1.5 sm:p-2 rounded-lg", channelColors.email)}>
+              <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
-            <span className="text-sm text-muted-foreground">Emails</span>
+            <span className="text-xs sm:text-sm text-muted-foreground">Emails</span>
           </div>
-          <p className="text-2xl font-bold text-foreground">
+          <p className="text-xl sm:text-2xl font-bold text-foreground">
             {mockMessages.filter((m) => m.channel === "email").length}
           </p>
         </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-2 rounded-lg bg-primary/10 text-primary">
-              <User className="h-4 w-4" />
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 text-primary">
+              <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
-            <span className="text-sm text-muted-foreground">Conversations</span>
+            <span className="text-xs sm:text-sm text-muted-foreground">Conversations</span>
           </div>
-          <p className="text-2xl font-bold text-foreground">
+          <p className="text-xl sm:text-2xl font-bold text-foreground">
             {conversationList.length}
           </p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Conversation List */}
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
-          <div className="p-4 border-b border-border">
+        <div className={cn(
+          "bg-card rounded-xl border border-border overflow-hidden",
+          selectedConversation ? "hidden lg:block" : "block",
+          "max-h-[400px] lg:max-h-none"
+        )}>
+          <div className="p-3 sm:p-4 border-b border-border">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
@@ -180,14 +184,14 @@ export default function CommunicationsPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div className="flex gap-2 mt-3">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 sm:mt-3">
               {["all", "whatsapp", "voice", "email"].map((channel) => (
                 <Button
                   key={channel}
                   variant={channelFilter === channel ? "default" : "outline"}
                   size="sm"
                   onClick={() => setChannelFilter(channel)}
-                  className="capitalize"
+                  className="capitalize text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                 >
                   {channel === "all" ? "All" : channel}
                 </Button>
@@ -195,33 +199,33 @@ export default function CommunicationsPage() {
             </div>
           </div>
 
-          <div className="divide-y divide-border max-h-[500px] overflow-y-auto">
+          <div className="divide-y divide-border max-h-[350px] lg:max-h-[500px] overflow-y-auto">
             {filteredConversations.map((conv) => (
               <button
                 key={conv.candidatePhone}
                 className={cn(
-                  "w-full text-left p-4 hover:bg-muted/50 transition-colors",
+                  "w-full text-left p-3 sm:p-4 hover:bg-muted/50 transition-colors",
                   selectedConversation === conv.candidatePhone && "bg-muted"
                 )}
                 onClick={() => setSelectedConversation(conv.candidatePhone)}
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold text-sm sm:text-base shrink-0">
                     {conv.candidateName.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium text-foreground truncate">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-medium text-foreground truncate text-sm sm:text-base">
                         {conv.candidateName}
                       </p>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-[10px] sm:text-xs text-muted-foreground shrink-0">
                         {new Date(conv.lastMessage.timestamp).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground truncate">
+                    <p className="text-xs sm:text-sm text-muted-foreground truncate">
                       {conv.lastMessage.content}
                     </p>
                   </div>
@@ -230,7 +234,7 @@ export default function CommunicationsPage() {
             ))}
 
             {filteredConversations.length === 0 && (
-              <div className="text-center py-12">
+              <div className="text-center py-8 sm:py-12">
                 <MessageSquare className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
                 <p className="text-sm text-muted-foreground">No conversations found</p>
               </div>
@@ -239,20 +243,30 @@ export default function CommunicationsPage() {
         </div>
 
         {/* Message View */}
-        <div className="col-span-2 bg-card rounded-xl border border-border overflow-hidden flex flex-col">
+        <div className={cn(
+          "lg:col-span-2 bg-card rounded-xl border border-border overflow-hidden flex flex-col",
+          !selectedConversation ? "hidden lg:flex" : "flex",
+          "min-h-[400px] lg:min-h-0"
+        )}>
           {selectedConversation ? (
             <>
               {/* Header */}
-              <div className="p-4 border-b border-border bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold">
+              <div className="p-3 sm:p-4 border-b border-border bg-muted/30">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <button 
+                    className="lg:hidden p-1 hover:bg-muted rounded"
+                    onClick={() => setSelectedConversation(null)}
+                  >
+                    <MessageSquare className="h-5 w-5 text-muted-foreground" />
+                  </button>
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold text-sm sm:text-base shrink-0">
                     {conversations[selectedConversation]?.candidateName.charAt(0)}
                   </div>
-                  <div>
-                    <p className="font-medium text-foreground">
+                  <div className="min-w-0">
+                    <p className="font-medium text-foreground text-sm sm:text-base truncate">
                       {conversations[selectedConversation]?.candidateName}
                     </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground truncate">
                       {selectedConversation}
                     </p>
                   </div>
@@ -260,35 +274,35 @@ export default function CommunicationsPage() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 p-4 space-y-4 max-h-[400px] overflow-y-auto">
+              <div className="flex-1 p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-[300px] sm:max-h-[400px] overflow-y-auto">
                 {conversations[selectedConversation]?.messages.map((msg) => (
                   <div
                     key={msg.id}
                     className={cn(
-                      "flex gap-3",
+                      "flex gap-2 sm:gap-3",
                       msg.direction === "outbound" && "flex-row-reverse"
                     )}
                   >
                     <div
                       className={cn(
-                        "max-w-[70%] rounded-lg p-3",
+                        "max-w-[85%] sm:max-w-[70%] rounded-lg p-2.5 sm:p-3",
                         msg.direction === "outbound"
                           ? "bg-primary text-primary-foreground"
                           : "bg-muted"
                       )}
                     >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={cn("p-1 rounded", msg.direction === "outbound" ? "bg-primary-foreground/20" : channelColors[msg.channel])}>
+                      <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                        <span className={cn("p-0.5 sm:p-1 rounded", msg.direction === "outbound" ? "bg-primary-foreground/20" : channelColors[msg.channel])}>
                           {channelIcons[msg.channel]}
                         </span>
-                        <span className="text-xs opacity-80 capitalize">{msg.channel}</span>
+                        <span className="text-[10px] sm:text-xs opacity-80 capitalize">{msg.channel}</span>
                       </div>
-                      <p className="text-sm">{msg.content}</p>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-xs opacity-70">
+                      <p className="text-xs sm:text-sm">{msg.content}</p>
+                      <div className="flex items-center justify-between mt-1.5 sm:mt-2 gap-2">
+                        <span className="text-[10px] sm:text-xs opacity-70">
                           {new Date(msg.timestamp).toLocaleString()}
                         </span>
-                        <span className={cn("text-xs font-medium capitalize", statusColors[msg.status])}>
+                        <span className={cn("text-[10px] sm:text-xs font-medium capitalize", statusColors[msg.status])}>
                           {msg.status}
                         </span>
                       </div>
@@ -298,19 +312,19 @@ export default function CommunicationsPage() {
               </div>
 
               {/* Quick Actions */}
-              <div className="p-4 border-t border-border bg-muted/30">
-                <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Send WhatsApp
+              <div className="p-3 sm:p-4 border-t border-border bg-muted/30">
+                <div className="flex gap-1.5 sm:gap-2">
+                  <Button variant="outline" className="flex-1 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3">
+                    <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">WhatsApp</span>
                   </Button>
-                  <Button variant="outline" className="flex-1">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Make Call
+                  <Button variant="outline" className="flex-1 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3">
+                    <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Call</span>
                   </Button>
-                  <Button variant="outline" className="flex-1">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Send Email
+                  <Button variant="outline" className="flex-1 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3">
+                    <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Email</span>
                   </Button>
                 </div>
               </div>

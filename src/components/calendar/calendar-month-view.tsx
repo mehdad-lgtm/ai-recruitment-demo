@@ -53,6 +53,8 @@ export function CalendarMonthView({ onEventClick, onDayClick }: CalendarMonthVie
 
   return (
     <div className="bg-card/60 rounded-2xl border border-border/40 overflow-hidden">
+      <div className="overflow-x-auto">
+        <div className="min-w-[640px]">
       {/* Week Day Headers */}
       <div className="grid grid-cols-7 border-b border-border/40 bg-muted/20">
         {WEEK_DAYS.map((day) => (
@@ -132,6 +134,8 @@ export function CalendarMonthView({ onEventClick, onDayClick }: CalendarMonthVie
             </div>
           );
         })}
+      </div>
+        </div>
       </div>
     </div>
   );

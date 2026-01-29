@@ -251,29 +251,29 @@ export default function RecruiterDashboard() {
       </div>
 
       {/* QR Code Performance */}
-      <div className="mt-8 bg-card rounded-xl border border-(--color-border) p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-foreground">QR Code Performance</h3>
+      <div className="mt-6 sm:mt-8 bg-card rounded-xl border border-(--color-border) p-4 sm:p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+          <h3 className="text-base sm:text-lg font-semibold text-foreground">QR Code Performance</h3>
           <Link href="/recruiter/qr-codes">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
               Manage QR Codes
             </Button>
           </Link>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
           {[
             { code: "QR-001", location: "Mall Event", scans: 45, conversions: 32 },
             { code: "QR-002", location: "Job Fair", scans: 78, conversions: 56 },
             { code: "QR-003", location: "University", scans: 23, conversions: 18 },
           ].map((qr) => (
-            <div key={qr.code} className="p-4 rounded-lg bg-muted/30">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-medium text-foreground">{qr.code}</span>
-                <QrCode className="h-5 w-5 text-primary" />
+            <div key={qr.code} className="p-3 sm:p-4 rounded-lg bg-muted/30">
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <span className="font-medium text-foreground text-sm sm:text-base">{qr.code}</span>
+                <QrCode className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
-              <p className="text-sm text-muted-foreground mb-2">{qr.location}</p>
-              <div className="flex justify-between text-sm">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-2">{qr.location}</p>
+              <div className="flex justify-between text-xs sm:text-sm">
                 <div>
                   <span className="text-muted-foreground">Scans: </span>
                   <span className="font-medium text-foreground">{qr.scans}</span>
@@ -283,7 +283,7 @@ export default function RecruiterDashboard() {
                   <span className="font-medium text-green-600">{qr.conversions}</span>
                 </div>
               </div>
-              <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">
+              <div className="mt-2 h-1.5 sm:h-2 bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-green-500 rounded-full"
                   style={{ width: `${(qr.conversions / qr.scans) * 100}%` }}

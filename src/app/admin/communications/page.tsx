@@ -226,59 +226,63 @@ export default function AdminCommunicationsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <MessageSquare className="h-5 w-5 text-primary" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg shrink-0">
+              <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.totalActive}</p>
-              <p className="text-sm text-muted-foreground">Active Conversations</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <Bot className="h-5 w-5 text-blue-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.aiHandled}</p>
-              <p className="text-sm text-muted-foreground">AI Handled</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.totalActive}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">Active Chats</p>
             </div>
           </div>
         </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-orange-500/10 rounded-lg">
-              <Hand className="h-5 w-5 text-orange-500" />
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-blue-500/10 rounded-lg shrink-0">
+              <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.humanTakeover}</p>
-              <p className="text-sm text-muted-foreground">Human Takeover</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.aiHandled}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">AI Handled</p>
             </div>
           </div>
         </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-500/10 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-red-500" />
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-orange-500/10 rounded-lg shrink-0">
+              <Hand className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.needsAttention}</p>
-              <p className="text-sm text-muted-foreground">Needs Attention</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.humanTakeover}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">Human Takeover</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-red-500/10 rounded-lg shrink-0">
+              <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.needsAttention}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">Needs Attention</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-3 gap-6 h-[calc(100vh-380px)]">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 h-auto lg:h-[calc(100vh-380px)]">
         {/* Conversation List */}
-        <div className="bg-card rounded-xl border border-border overflow-hidden flex flex-col">
+        <div className={cn(
+          "bg-card rounded-xl border border-border overflow-hidden flex flex-col",
+          selectedConversation ? "hidden lg:flex" : "flex",
+          "max-h-[400px] lg:max-h-none"
+        )}>
           {/* Filters */}
-          <div className="p-4 border-b border-border space-y-3">
+          <div className="p-3 sm:p-4 border-b border-border space-y-2 sm:space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
@@ -291,7 +295,7 @@ export default function AdminCommunicationsPage() {
             </div>
             <div className="flex gap-2">
               <select
-                className="flex-1 px-3 py-1.5 bg-muted border border-border rounded-lg text-sm"
+                className="flex-1 px-2 sm:px-3 py-1.5 bg-muted border border-border rounded-lg text-xs sm:text-sm"
                 value={selectedChannel}
                 onChange={(e) => setSelectedChannel(e.target.value)}
               >
@@ -301,14 +305,14 @@ export default function AdminCommunicationsPage() {
                 <option value="voice">Voice</option>
               </select>
               <select
-                className="flex-1 px-3 py-1.5 bg-muted border border-border rounded-lg text-sm"
+                className="flex-1 px-2 sm:px-3 py-1.5 bg-muted border border-border rounded-lg text-xs sm:text-sm"
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
               >
                 <option value="all">All Status</option>
                 <option value="ai-active">AI Active</option>
-                <option value="human-takeover">Human Takeover</option>
-                <option value="needs-attention">Needs Attention</option>
+                <option value="human-takeover">Human</option>
+                <option value="needs-attention">Attention</option>
                 <option value="closed">Closed</option>
               </select>
             </div>
@@ -320,38 +324,38 @@ export default function AdminCommunicationsPage() {
               <button
                 key={conv.id}
                 className={cn(
-                  "w-full text-left p-4 hover:bg-muted/50 transition-colors",
+                  "w-full text-left p-3 sm:p-4 hover:bg-muted/50 transition-colors",
                   selectedConversation === conv.id && "bg-muted"
                 )}
                 onClick={() => setSelectedConversation(conv.id)}
               >
-                <div className="flex items-start gap-3">
-                  <div className="relative">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="relative shrink-0">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold text-sm sm:text-base">
                       {conv.candidate.name.charAt(0)}
                     </div>
-                    <div className={cn("absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-white", channelColors[conv.channel])}>
+                    <div className={cn("absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-white", channelColors[conv.channel])}>
                       {channelIcons[conv.channel]}
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium text-foreground truncate">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-medium text-foreground truncate text-sm sm:text-base">
                         {conv.candidate.name}
                       </p>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-[10px] sm:text-xs text-muted-foreground shrink-0">
                         {formatTime(conv.lastMessageTime)}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground truncate mt-0.5">
+                    <p className="text-xs sm:text-sm text-muted-foreground truncate mt-0.5">
                       {conv.lastMessage}
                     </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", statusColors[conv.status])}>
+                    <div className="flex items-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2">
+                      <span className={cn("px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium", statusColors[conv.status])}>
                         {statusLabels[conv.status]}
                       </span>
                       {conv.unreadCount > 0 && (
-                        <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
+                        <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-primary text-primary-foreground text-[10px] sm:text-xs flex items-center justify-center">
                           {conv.unreadCount}
                         </span>
                       )}
@@ -364,48 +368,56 @@ export default function AdminCommunicationsPage() {
         </div>
 
         {/* Chat View */}
-        <div className="col-span-2 bg-card rounded-xl border border-border overflow-hidden flex flex-col">
+        <div className={cn(
+          "lg:col-span-2 bg-card rounded-xl border border-border overflow-hidden flex flex-col",
+          !selectedConversation ? "hidden lg:flex" : "flex",
+          "min-h-[400px] lg:min-h-0"
+        )}>
           {currentConversation ? (
             <>
               {/* Chat Header */}
-              <div className="p-4 border-b border-border bg-muted/30">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold">
+              <div className="p-3 sm:p-4 border-b border-border bg-muted/30">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <button 
+                      className="lg:hidden p-1 hover:bg-muted rounded"
+                      onClick={() => setSelectedConversation(null)}
+                    >
+                      <MessageSquare className="h-5 w-5 text-muted-foreground" />
+                    </button>
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold shrink-0 text-sm sm:text-base">
                       {currentConversation.candidate.name.charAt(0)}
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">
                         {currentConversation.candidate.name}
                       </h3>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>{currentConversation.candidate.phone}</span>
-                        <span>•</span>
-                        <span>{currentConversation.stage}</span>
+                      <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
+                        <span className="truncate">{currentConversation.stage}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                     {currentConversation.status === "ai-active" && currentConversation.aiConfidence && (
-                      <div className="flex items-center gap-2 px-3 py-1 bg-blue-500/10 rounded-lg">
-                        <Bot className="h-4 w-4 text-blue-500" />
-                        <span className="text-sm text-blue-600">
-                          AI Confidence: {Math.round(currentConversation.aiConfidence * 100)}%
+                      <div className="hidden sm:flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 bg-blue-500/10 rounded-lg">
+                        <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
+                        <span className="text-xs sm:text-sm text-blue-600">
+                          {Math.round(currentConversation.aiConfidence * 100)}%
                         </span>
                       </div>
                     )}
                     {currentConversation.status === "ai-active" ? (
-                      <Button variant="outline" size="sm">
-                        <Hand className="h-4 w-4 mr-2" />
-                        Takeover
+                      <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8">
+                        <Hand className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Takeover</span>
                       </Button>
                     ) : currentConversation.status === "human-takeover" ? (
-                      <Button variant="outline" size="sm">
-                        <Bot className="h-4 w-4 mr-2" />
-                        Return to AI
+                      <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8">
+                        <Bot className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Return to AI</span>
                       </Button>
                     ) : null}
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </div>
@@ -413,7 +425,7 @@ export default function AdminCommunicationsPage() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
                 {mockMessages.map((message) => (
                   <div
                     key={message.id}
@@ -424,21 +436,21 @@ export default function AdminCommunicationsPage() {
                   >
                     <div
                       className={cn(
-                        "max-w-[70%] rounded-2xl p-4",
+                        "max-w-[85%] sm:max-w-[70%] rounded-2xl p-3 sm:p-4",
                         message.sender === "candidate"
                           ? "bg-muted text-foreground rounded-tl-sm"
                           : "bg-primary text-primary-foreground rounded-tr-sm"
                       )}
                     >
                       {message.sender === "ai" && (
-                        <div className="flex items-center gap-1 mb-2 opacity-70">
+                        <div className="flex items-center gap-1 mb-1.5 sm:mb-2 opacity-70">
                           <Bot className="h-3 w-3" />
-                          <span className="text-xs">AI Assistant</span>
+                          <span className="text-[10px] sm:text-xs">AI Assistant</span>
                         </div>
                       )}
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <p className="text-xs sm:text-sm whitespace-pre-wrap">{message.content}</p>
                       <p className={cn(
-                        "text-xs mt-2",
+                        "text-[10px] sm:text-xs mt-1.5 sm:mt-2",
                         message.sender === "candidate" ? "text-muted-foreground" : "opacity-70"
                       )}>
                         {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -450,12 +462,12 @@ export default function AdminCommunicationsPage() {
 
               {/* Message Input */}
               {currentConversation.status !== "closed" && (
-                <div className="p-4 border-t border-border">
+                <div className="p-3 sm:p-4 border-t border-border">
                   {currentConversation.status === "ai-active" && (
-                    <div className="flex items-center gap-2 mb-3 p-2 bg-blue-500/10 rounded-lg">
-                      <Bot className="h-4 w-4 text-blue-500" />
-                      <span className="text-sm text-blue-600">
-                        AI is handling this conversation. Click &quot;Takeover&quot; to respond manually.
+                    <div className="flex items-center gap-2 mb-2 sm:mb-3 p-2 bg-blue-500/10 rounded-lg">
+                      <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 shrink-0" />
+                      <span className="text-xs sm:text-sm text-blue-600">
+                        AI is handling this. Click &quot;Takeover&quot; to respond.
                       </span>
                     </div>
                   )}
@@ -464,15 +476,15 @@ export default function AdminCommunicationsPage() {
                       type="text"
                       placeholder={
                         currentConversation.status === "ai-active"
-                          ? "AI is handling this conversation..."
+                          ? "AI is handling..."
                           : "Type a message..."
                       }
-                      className="flex-1 px-4 py-2 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none text-sm"
+                      className="flex-1 px-3 sm:px-4 py-2 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none text-sm"
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
                       disabled={currentConversation.status === "ai-active"}
                     />
-                    <Button disabled={currentConversation.status === "ai-active" || !messageInput.trim()}>
+                    <Button disabled={currentConversation.status === "ai-active" || !messageInput.trim()} size="sm" className="h-9">
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>

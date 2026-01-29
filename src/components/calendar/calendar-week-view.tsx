@@ -96,6 +96,8 @@ export function CalendarWeekView({ onEventClick, onTimeSlotClick }: CalendarWeek
 
   return (
     <div className="bg-card/60 rounded-2xl border border-border/40 overflow-hidden">
+      <div className="overflow-x-auto">
+        <div className="min-w-[800px]">
       {/* All-day Events Row */}
       {allDayEvents.length > 0 && (
         <div className="border-b border-border/40 bg-muted/20">
@@ -239,6 +241,8 @@ export function CalendarWeekView({ onEventClick, onTimeSlotClick }: CalendarWeek
               </div>
             );
           })}
+        </div>
+      </div>
         </div>
       </div>
     </div>

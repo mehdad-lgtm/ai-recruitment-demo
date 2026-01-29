@@ -5,6 +5,7 @@ import { CalendarProvider } from "@/components/calendar/calendar-context";
 import type { ICalendarEvent, ICalendarUser } from "@/components/calendar/types";
 import { ProtectedDashboard } from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import {
     Calendar,
@@ -202,18 +203,18 @@ export default function AdminInterviewsPage() {
   return (
     <ProtectedDashboard allowedRoles={["admin"]}>
       {/* Page Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Interview Sessions</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Interview Sessions</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Manage and monitor all interview sessions across the organization.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center bg-muted rounded-lg p-1">
             <button
               className={cn(
-                "px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
+                "px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors",
                 view === "calendar"
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
@@ -225,7 +226,7 @@ export default function AdminInterviewsPage() {
             </button>
             <button
               className={cn(
-                "px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
+                "px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors",
                 view === "list"
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
@@ -236,56 +237,56 @@ export default function AdminInterviewsPage() {
               List
             </button>
           </div>
-          <Button onClick={() => setShowScheduleModal(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Schedule Interview
+          <Button onClick={() => setShowScheduleModal(true)} className="text-xs sm:text-sm">
+            <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="hidden xs:inline">Schedule</span> Interview
           </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <Calendar className="h-5 w-5 text-blue-500" />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-blue-500/10 rounded-lg shrink-0">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.today}</p>
-              <p className="text-sm text-muted-foreground">Today&apos;s Sessions</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500/10 rounded-lg">
-              <Clock className="h-5 w-5 text-purple-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.scheduled}</p>
-              <p className="text-sm text-muted-foreground">Scheduled</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.today}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">Today&apos;s Sessions</p>
             </div>
           </div>
         </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/10 rounded-lg">
-              <Check className="h-5 w-5 text-green-500" />
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-purple-500/10 rounded-lg shrink-0">
+              <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.completed}</p>
-              <p className="text-sm text-muted-foreground">Completed</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.scheduled}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">Scheduled</p>
             </div>
           </div>
         </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-500/10 rounded-lg">
-              <X className="h-5 w-5 text-red-500" />
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-green-500/10 rounded-lg shrink-0">
+              <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.noShow}</p>
-              <p className="text-sm text-muted-foreground">No Shows</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.completed}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">Completed</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-red-500/10 rounded-lg shrink-0">
+              <X className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.noShow}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">No Shows</p>
             </div>
           </div>
         </div>
@@ -295,22 +296,25 @@ export default function AdminInterviewsPage() {
         /* Calendar View */
         <div className="space-y-4">
           {/* Interviewer Legend */}
-          <div className="flex items-center gap-4 bg-card rounded-xl border border-border p-4">
-            {mockInterviewers.map((interviewer) => (
-              <div key={interviewer.id} className="flex items-center gap-2">
-                <div
-                  className={cn(
-                    "w-3 h-3 rounded-full",
-                    interviewer.color === "blue" && "bg-blue-500",
-                    interviewer.color === "green" && "bg-green-500",
-                    interviewer.color === "purple" && "bg-purple-500",
-                    interviewer.color === "orange" && "bg-orange-500"
-                  )}
-                />
-                <span className="text-sm text-foreground">{interviewer.name}</span>
-              </div>
-            ))}
-          </div>
+          <ScrollArea className="w-full">
+            <div className="flex items-center gap-3 sm:gap-4 bg-card rounded-xl border border-border p-3 sm:p-4 min-w-max">
+              {mockInterviewers.map((interviewer) => (
+                <div key={interviewer.id} className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                  <div
+                    className={cn(
+                      "w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full",
+                      interviewer.color === "blue" && "bg-blue-500",
+                      interviewer.color === "green" && "bg-green-500",
+                      interviewer.color === "purple" && "bg-purple-500",
+                      interviewer.color === "orange" && "bg-orange-500"
+                    )}
+                  />
+                  <span className="text-xs sm:text-sm text-foreground whitespace-nowrap">{interviewer.name}</span>
+                </div>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
 
           {/* Calendar */}
           <CalendarProvider
@@ -332,7 +336,7 @@ export default function AdminInterviewsPage() {
         <div className="space-y-4">
           {/* Filters */}
           <div className="bg-card rounded-xl border border-border p-4">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
@@ -371,7 +375,8 @@ export default function AdminInterviewsPage() {
 
           {/* Sessions Table */}
           <div className="bg-card rounded-xl border border-border overflow-hidden">
-            <table className="w-full">
+            <ScrollArea className="w-full">
+              <table className="w-full min-w-[800px]">
               <thead className="bg-muted/50">
                 <tr>
                   <th className="text-left p-4 font-medium text-muted-foreground">Candidate</th>
@@ -438,15 +443,17 @@ export default function AdminInterviewsPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
           </div>
         </div>
       )}
 
       {/* Schedule Interview Modal */}
       {showScheduleModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-xl border border-border w-full max-w-lg p-6">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-xl border border-border w-full max-w-lg p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-foreground">Schedule Interview</h3>
               <button onClick={() => setShowScheduleModal(false)}>

@@ -201,11 +201,11 @@ export default function SessionsPage() {
   return (
     <ProtectedDashboard allowedRoles={["admin", "interviewer"]}>
       {/* Page Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">My Sessions</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">My Sessions</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
               View and manage your interview sessions.
             </p>
           </div>
@@ -214,20 +214,20 @@ export default function SessionsPage() {
               <Button
                 variant={viewMode === "calendar" ? "default" : "ghost"}
                 size="sm"
-                className="rounded-none"
+                className="rounded-none text-xs sm:text-sm"
                 onClick={() => setViewMode("calendar")}
               >
-                <Calendar className="h-4 w-4 mr-1" />
-                Calendar
+                <Calendar className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">Calendar</span>
               </Button>
               <Button
                 variant={viewMode === "list" ? "default" : "ghost"}
                 size="sm"
-                className="rounded-none"
+                className="rounded-none text-xs sm:text-sm"
                 onClick={() => setViewMode("list")}
               >
-                <List className="h-4 w-4 mr-1" />
-                List
+                <List className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">List</span>
               </Button>
             </div>
           </div>
@@ -246,8 +246,8 @@ export default function SessionsPage() {
         <div className="space-y-6">
           {/* Today's Sessions */}
           <div className="bg-card rounded-xl border border-border overflow-hidden">
-            <div className="px-6 py-4 border-b border-border bg-muted/30">
-              <h3 className="font-semibold text-foreground">Today&apos;s Sessions</h3>
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border bg-muted/30">
+              <h3 className="font-semibold text-foreground text-sm sm:text-base">Today&apos;s Sessions</h3>
             </div>
             <div className="divide-y divide-border">
               {upcomingSessions
@@ -255,12 +255,18 @@ export default function SessionsPage() {
                 .map((session, index) => (
                   <div
                     key={session.id}
-                    className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-muted/30 transition-colors"
                   >
-                    <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="h-6 w-6 text-primary" />
+                    <div className="flex items-center gap-3">
+                      <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <User className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0 sm:hidden">
+                        <p className="font-medium text-foreground text-sm">{session.candidateName}</p>
+                        <p className="text-xs text-muted-foreground">{session.position}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="hidden sm:block flex-1 min-w-0">
                       <p className="font-medium text-foreground">{session.candidateName}</p>
                       <p className="text-sm text-muted-foreground">{session.position}</p>
                       <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
@@ -277,14 +283,20 @@ export default function SessionsPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="shrink-0 flex gap-2">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground sm:hidden">
+                      <Clock className="h-3 w-3" />
+                      <span>{session.time}</span>
+                      <span>•</span>
+                      <span>{session.duration}</span>
+                    </div>
+                    <div className="flex gap-2 sm:shrink-0">
                       <Link href={`/interviewer/briefs/${session.id}`}>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8">
                           View Brief
                         </Button>
                       </Link>
                       {index === 0 && (
-                        <Button size="sm">
+                        <Button size="sm" className="text-xs sm:text-sm h-8">
                           Join Now
                         </Button>
                       )}
@@ -302,8 +314,8 @@ export default function SessionsPage() {
 
           {/* Upcoming Sessions */}
           <div className="bg-card rounded-xl border border-border overflow-hidden">
-            <div className="px-6 py-4 border-b border-border bg-muted/30">
-              <h3 className="font-semibold text-foreground">Upcoming Sessions</h3>
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border bg-muted/30">
+              <h3 className="font-semibold text-foreground text-sm sm:text-base">Upcoming Sessions</h3>
             </div>
             <div className="divide-y divide-border">
               {upcomingSessions
@@ -311,12 +323,18 @@ export default function SessionsPage() {
                 .map((session) => (
                   <div
                     key={session.id}
-                    className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-muted/30 transition-colors"
                   >
-                    <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="h-6 w-6 text-primary" />
+                    <div className="flex items-center gap-3">
+                      <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <User className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0 sm:hidden">
+                        <p className="font-medium text-foreground text-sm">{session.candidateName}</p>
+                        <p className="text-xs text-muted-foreground">{session.position}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="hidden sm:block flex-1 min-w-0">
                       <p className="font-medium text-foreground">{session.candidateName}</p>
                       <p className="text-sm text-muted-foreground">{session.position}</p>
                       <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
@@ -327,8 +345,13 @@ export default function SessionsPage() {
                         <span>{session.duration}</span>
                       </div>
                     </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground sm:hidden">
+                      <span>{session.date.toLocaleDateString()}</span>
+                      <span>•</span>
+                      <span>{session.time}</span>
+                    </div>
                     <Link href={`/interviewer/briefs/${session.id}`}>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8 w-full sm:w-auto">
                         View Brief
                         <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>

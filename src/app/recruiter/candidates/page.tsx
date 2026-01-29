@@ -2,6 +2,7 @@
 
 import { ProtectedDashboard } from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import {
     ChevronLeft,
@@ -113,7 +114,7 @@ export default function CandidatesPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-5 mb-8">
+      <div className="grid gap-2 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-6 sm:mb-8">
         {Object.entries(statusLabels).map(([key, label]) => {
           const count = mockCandidates.filter((c) => c.status === key).length;
           return (
@@ -121,124 +122,127 @@ export default function CandidatesPage() {
               key={key}
               onClick={() => setStatusFilter(key === statusFilter ? "all" : key)}
               className={cn(
-                "bg-card rounded-xl border border-border p-4 text-left transition-all hover:shadow-md",
+                "bg-card rounded-xl border border-border p-2 sm:p-4 text-left transition-all hover:shadow-md",
                 statusFilter === key && "ring-2 ring-primary"
               )}
             >
-              <p className="text-sm text-muted-foreground">{label}</p>
-              <p className="text-2xl font-bold text-foreground">{count}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">{label}</p>
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{count}</p>
             </button>
           );
         })}
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-4 flex-1">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search candidates..."
-              className="w-full pl-10 pr-4 py-2 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <Button
-            variant={statusFilter !== "all" ? "default" : "outline"}
-            onClick={() => setStatusFilter("all")}
-          >
-            <Filter className="h-4 w-4 mr-2" />
-            {statusFilter === "all" ? "All Statuses" : statusLabels[statusFilter]}
-          </Button>
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search candidates..."
+            className="w-full pl-10 pr-4 py-2 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none text-sm"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
+        <Button
+          variant={statusFilter !== "all" ? "default" : "outline"}
+          onClick={() => setStatusFilter("all")}
+          size="sm"
+          className="text-xs sm:text-sm shrink-0"
+        >
+          <Filter className="h-4 w-4 mr-1 sm:mr-2" />
+          {statusFilter === "all" ? "All Statuses" : statusLabels[statusFilter]}
+        </Button>
       </div>
 
       {/* Candidates List */}
       <div className="bg-card rounded-xl border border-border overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-muted/50">
-            <tr>
-              <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
-                Candidate
-              </th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
-                Contact
-              </th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
-                Source
-              </th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
-                Registered
-              </th>
-              <th className="text-center px-6 py-3 text-sm font-medium text-muted-foreground">
-                Status
-              </th>
-              <th className="text-right px-6 py-3 text-sm font-medium text-muted-foreground">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {filteredCandidates.map((candidate) => (
-              <tr key={candidate.id} className="hover:bg-muted/30 transition-colors">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold">
-                      {candidate.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">{candidate.name}</p>
-                      <p className="text-xs text-muted-foreground">{candidate.language}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-foreground">
-                      <Phone className="h-3 w-3 text-muted-foreground" />
-                      {candidate.phone}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Mail className="h-3 w-3" />
-                      {candidate.email}
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-sm text-foreground">{candidate.source}</td>
-                <td className="px-6 py-4 text-sm text-muted-foreground">
-                  {new Date(candidate.registeredAt).toLocaleDateString()}
-                </td>
-                <td className="px-6 py-4 text-center">
-                  <span
-                    className={cn(
-                      "px-2.5 py-1 rounded-full text-xs font-medium",
-                      statusColors[candidate.status]
-                    )}
-                  >
-                    {statusLabels[candidate.status]}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Link href={`/recruiter/candidates/${candidate.id}`}>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MessageSquare className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Phone className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </td>
+        <ScrollArea className="w-full">
+          <table className="w-full min-w-[800px]">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="text-left px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium text-muted-foreground">
+                  Candidate
+                </th>
+                <th className="text-left px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium text-muted-foreground">
+                  Contact
+                </th>
+                <th className="text-left px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium text-muted-foreground">
+                  Source
+                </th>
+                <th className="text-left px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium text-muted-foreground">
+                  Registered
+                </th>
+                <th className="text-center px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium text-muted-foreground">
+                  Status
+                </th>
+                <th className="text-right px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium text-muted-foreground">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {filteredCandidates.map((candidate) => (
+                <tr key={candidate.id} className="hover:bg-muted/30 transition-colors">
+                  <td className="px-4 sm:px-6 py-3 sm:py-4">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold text-sm sm:text-base shrink-0">
+                        {candidate.name.charAt(0)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground text-sm sm:text-base truncate">{candidate.name}</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">{candidate.language}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 sm:px-6 py-3 sm:py-4">
+                    <div className="space-y-0.5 sm:space-y-1">
+                      <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-foreground">
+                        <Phone className="h-3 w-3 text-muted-foreground shrink-0" />
+                        <span className="truncate">{candidate.phone}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
+                        <Mail className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{candidate.email}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-foreground">{candidate.source}</td>
+                  <td className="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-muted-foreground">
+                    {new Date(candidate.registeredAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 sm:px-6 py-3 sm:py-4 text-center">
+                    <span
+                      className={cn(
+                        "px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium",
+                        statusColors[candidate.status]
+                      )}
+                    >
+                      {statusLabels[candidate.status]}
+                    </span>
+                  </td>
+                  <td className="px-4 sm:px-6 py-3 sm:py-4 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <Link href={`/recruiter/candidates/${candidate.id}`}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8">
+                          <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </Button>
+                      </Link>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8">
+                        <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8">
+                        <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
 
         {filteredCandidates.length === 0 && (
           <div className="text-center py-12">
@@ -248,18 +252,18 @@ export default function CandidatesPage() {
         )}
 
         {/* Pagination */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-          <p className="text-sm text-muted-foreground">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-border">
+          <p className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
             Showing {filteredCandidates.length} of {mockCandidates.length} candidates
           </p>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" disabled>
-              <ChevronLeft className="h-4 w-4" />
-              Previous
+            <Button variant="outline" size="sm" disabled className="text-xs sm:text-sm h-8">
+              <ChevronLeft className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Previous</span>
             </Button>
-            <Button variant="outline" size="sm" disabled>
-              Next
-              <ChevronRight className="h-4 w-4" />
+            <Button variant="outline" size="sm" disabled className="text-xs sm:text-sm h-8">
+              <span className="hidden sm:inline">Next</span>
+              <ChevronRight className="h-4 w-4 sm:ml-1" />
             </Button>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { createUser, deleteUser, getAllUsers, toggleUserStatus, updateUser, type
 import { ProtectedDashboard } from "@/components/dashboard";
 import { LoadingSpinner } from "@/components/ui";
 import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
     Select,
     SelectContent,
@@ -22,9 +23,8 @@ import {
     Settings as SettingsIcon,
     Shield,
     Trash2,
-    User,
     Users,
-    X,
+    X
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -168,30 +168,33 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Settings Sidebar */}
-        <div className="bg-card rounded-xl border border-border p-4">
-          <h3 className="font-semibold text-foreground mb-4">Settings</h3>
-          <nav className="space-y-1">
-            {sections.map((section) => {
-              const Icon = section.icon;
-              return (
-                <button
-                  key={section.id}
-                  onClick={() => setActiveSection(section.id)}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    activeSection === section.id
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  {section.label}
-                </button>
-              );
-            })}
-          </nav>
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <h3 className="font-semibold text-foreground mb-3 sm:mb-4 text-sm sm:text-base">Settings</h3>
+          <ScrollArea className="w-full lg:w-auto">
+            <nav className="flex lg:flex-col gap-1 min-w-max lg:min-w-0">
+              {sections.map((section) => {
+                const Icon = section.icon;
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => setActiveSection(section.id)}
+                    className={cn(
+                      "flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap",
+                      activeSection === section.id
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    )}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    {section.label}
+                  </button>
+                );
+              })}
+            </nav>
+            <ScrollBar orientation="horizontal" className="lg:hidden" />
+          </ScrollArea>
         </div>
 
         {/* Main Content */}
@@ -200,131 +203,128 @@ export default function SettingsPage() {
             <>
               {/* Team Members Section */}
               <div className="bg-card rounded-xl border border-border overflow-hidden">
-                <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+                <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-lg font-semibold text-foreground">Team Members</h2>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <h2 className="text-base sm:text-lg font-semibold text-foreground">Team Members</h2>
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                       Manage your team members and their roles
                     </p>
                   </div>
-                  <Button onClick={handleCreateUser}>
-                    <Plus className="h-4 w-4 mr-2" />
+                  <Button onClick={handleCreateUser} size="sm" className="text-xs sm:text-sm">
+                    <Plus className="h-4 w-4 mr-1 sm:mr-2" />
                     Add User
                   </Button>
                 </div>
 
                 {loading ? (
-                  <div className="p-12 flex items-center justify-center">
+                  <div className="p-8 sm:p-12 flex items-center justify-center">
                     <LoadingSpinner size="lg" />
                   </div>
                 ) : (
-                  <table className="w-full">
-                    <thead className="bg-muted/50">
-                      <tr>
-                        <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
-                          User
-                        </th>
-                        <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
-                          Role
-                        </th>
-                        <th className="text-center px-6 py-3 text-sm font-medium text-muted-foreground">
-                          Status
-                        </th>
-                        <th className="text-right px-6 py-3 text-sm font-medium text-muted-foreground">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {users.map((user) => (
-                        <tr key={user.id} className="hover:bg-muted/30 transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold">
-                                {user.name.charAt(0).toUpperCase()}
-                              </div>
-                              <div>
-                                <p className="font-medium text-foreground">{user.name}</p>
-                                <p className="text-sm text-muted-foreground">{user.email}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span
-                              className={cn(
-                                "px-2.5 py-1 rounded-full text-xs font-medium capitalize",
-                                roleColors[user.role]
-                              )}
-                            >
-                              {user.role}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <button
-                              onClick={() => handleToggleStatus(user.id)}
-                              className={cn(
-                                "px-3 py-1 rounded-full text-xs font-medium",
-                                user.isActive
-                                  ? "bg-green-500/10 text-green-600"
-                                  : "bg-gray-500/10 text-gray-600"
-                              )}
-                            >
-                              {user.isActive ? "Active" : "Inactive"}
-                            </button>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center justify-end gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleEditUser(user)}
-                              >
-                                <Pencil className="h-4 w-4 mr-1" />
-                                Edit
-                              </Button>
-                              {deleteConfirm === user.id ? (
-                                <div className="flex items-center gap-1">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleDeleteUser(user.id)}
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  >
-                                    <Check className="h-4 w-4 mr-1" />
-                                    Confirm
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setDeleteConfirm(null)}
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </Button>
+                  <ScrollArea className="w-full">
+                    <table className="w-full min-w-[700px]">
+                      <thead className="bg-muted/50">
+                        <tr>
+                          <th className="text-left px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium text-muted-foreground">
+                            User
+                          </th>
+                          <th className="text-left px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium text-muted-foreground">
+                            Role
+                          </th>
+                          <th className="text-center px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium text-muted-foreground">
+                            Status
+                          </th>
+                          <th className="text-right px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium text-muted-foreground">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {users.map((user) => (
+                          <tr key={user.id} className="hover:bg-muted/30 transition-colors">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold text-sm sm:text-base shrink-0">
+                                  {user.name.charAt(0).toUpperCase()}
                                 </div>
-                              ) : (
+                                <div className="min-w-0">
+                                  <p className="font-medium text-foreground text-sm sm:text-base truncate">{user.name}</p>
+                                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{user.email}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
+                              <span
+                                className={cn(
+                                  "px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium capitalize",
+                                  roleColors[user.role]
+                                )}
+                              >
+                                {user.role}
+                              </span>
+                            </td>
+                            <td className="px-4 sm:px-6 py-3 sm:py-4 text-center">
+                              <button
+                                onClick={() => handleToggleStatus(user.id)}
+                                className={cn(
+                                  "px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium",
+                                  user.isActive
+                                    ? "bg-green-500/10 text-green-600"
+                                    : "bg-gray-500/10 text-gray-600"
+                                )}
+                              >
+                                {user.isActive ? "Active" : "Inactive"}
+                              </button>
+                            </td>
+                            <td className="px-4 sm:px-6 py-3 sm:py-4">
+                              <div className="flex items-center justify-end gap-1 sm:gap-2">
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => setDeleteConfirm(user.id)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={() => handleEditUser(user)}
+                                  className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
                                 >
-                                  <Trash2 className="h-4 w-4 mr-1" />
-                                  Remove
+                                  <Pencil className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                                  <span className="hidden sm:inline">Edit</span>
                                 </Button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-
-                {!loading && users.length === 0 && (
-                  <div className="p-12 text-center">
-                    <User className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-                    <p className="text-muted-foreground">No users found</p>
-                  </div>
+                                {deleteConfirm === user.id ? (
+                                  <div className="flex items-center gap-1">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleDeleteUser(user.id)}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50 h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
+                                    >
+                                      <Check className="h-3 w-3 sm:h-4 sm:w-4" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => setDeleteConfirm(null)}
+                                      className="h-7 sm:h-8 px-2 sm:px-3"
+                                    >
+                                      <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setDeleteConfirm(user.id)}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50 h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
+                                  >
+                                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                                    <span className="hidden sm:inline">Remove</span>
+                                  </Button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <ScrollBar orientation="horizontal" />
+                  </ScrollArea>
                 )}
               </div>
             </>
@@ -396,7 +396,7 @@ export default function SettingsPage() {
       {/* User Modal */}
       {showUserModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-card rounded-xl border border-border w-full max-w-md">
+          <div className="bg-card rounded-xl border border-border w-full max-w-md max-h-[90vh] overflow-y-auto">
             <form onSubmit={handleSubmitUser}>
               <div className="px-6 py-4 border-b border-border">
                 <h3 className="text-lg font-semibold text-foreground">

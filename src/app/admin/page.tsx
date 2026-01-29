@@ -155,9 +155,9 @@ export default function AdminDashboard() {
       </div>
 
       {/* Pipeline Overview */}
-      <div className="mt-8 bg-card rounded-xl border border-(--color-border) p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-foreground mb-6">Pipeline Overview</h3>
-        <div className="grid gap-4 md:grid-cols-5">
+      <div className="mt-6 sm:mt-8 bg-card rounded-xl border border-(--color-border) p-4 sm:p-6 shadow-sm">
+        <h3 className="text-base sm:text-lg font-semibold text-foreground mb-4 sm:mb-6">Pipeline Overview</h3>
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
           {[
             { stage: "New Leads", count: 342, color: "bg-blue-500" },
             { stage: "Screening", count: 156, color: "bg-yellow-500" },
@@ -165,13 +165,13 @@ export default function AdminDashboard() {
             { stage: "Evaluation", count: 67, color: "bg-orange-500" },
             { stage: "Hired", count: 234, color: "bg-green-500" },
           ].map((stage) => (
-            <div key={stage.stage} className="text-center p-4 rounded-lg bg-muted/50">
+            <div key={stage.stage} className="text-center p-2 sm:p-4 rounded-lg bg-muted/50">
               <div
-                className={`w-12 h-12 mx-auto rounded-full ${stage.color} flex items-center justify-center text-white font-bold mb-3`}
+                className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-full ${stage.color} flex items-center justify-center text-white font-bold text-sm sm:text-base mb-2 sm:mb-3`}
               >
                 {stage.count > 99 ? "99+" : stage.count}
               </div>
-              <p className="text-sm font-medium text-foreground">{stage.stage}</p>
+              <p className="text-xs sm:text-sm font-medium text-foreground">{stage.stage}</p>
             </div>
           ))}
         </div>

@@ -2,6 +2,7 @@
 
 import { ProtectedDashboard } from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import {
     Calendar,
@@ -182,72 +183,72 @@ export default function AdminCandidatesPage() {
   return (
     <ProtectedDashboard allowedRoles={["admin"]}>
       {/* Page Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">All Candidates</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Candidates</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Manage and track all candidates in the recruitment pipeline.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <Upload className="h-4 w-4 mr-2" />
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+            <Upload className="h-4 w-4 mr-1 sm:mr-2" />
             Import
           </Button>
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
+          <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+            <Download className="h-4 w-4 mr-1 sm:mr-2" />
             Export
           </Button>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Candidate
+          <Button size="sm" className="text-xs sm:text-sm">
+            <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="hidden xs:inline">Add</span> Candidate
           </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Users className="h-5 w-5 text-primary" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg shrink-0">
+              <Users className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.total}</p>
-              <p className="text-sm text-muted-foreground">Total Candidates</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <UserPlus className="h-5 w-5 text-blue-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.new}</p>
-              <p className="text-sm text-muted-foreground">New This Week</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.total}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">Total Candidates</p>
             </div>
           </div>
         </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500/10 rounded-lg">
-              <User className="h-5 w-5 text-purple-500" />
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-blue-500/10 rounded-lg shrink-0">
+              <UserPlus className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.active}</p>
-              <p className="text-sm text-muted-foreground">Active in Pipeline</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.new}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">New This Week</p>
             </div>
           </div>
         </div>
-        <div className="bg-card rounded-xl border border-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/10 rounded-lg">
-              <UserCheck className="h-5 w-5 text-green-500" />
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-purple-500/10 rounded-lg shrink-0">
+              <User className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
             </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{stats.hired}</p>
-              <p className="text-sm text-muted-foreground">Hired</p>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.active}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">Active in Pipeline</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-green-500/10 rounded-lg shrink-0">
+              <UserCheck className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">{stats.hired}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">Hired</p>
             </div>
           </div>
         </div>
@@ -255,24 +256,30 @@ export default function AdminCandidatesPage() {
 
       {/* Filters & Search */}
       <div className="bg-card rounded-xl border border-border mb-6">
-        <div className="p-4 flex items-center justify-between gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search by name, email, or position..."
-              className="w-full pl-10 pr-4 py-2 bg-muted/50 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none text-sm"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+        <div className="p-3 sm:p-4 space-y-3">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search by name, email, or position..."
+                className="w-full pl-10 pr-4 py-2 bg-muted/50 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none text-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="shrink-0">
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
+            </Button>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center bg-muted rounded-lg p-1">
+          <ScrollArea className="w-full">
+            <div className="flex items-center bg-muted rounded-lg p-1 min-w-max">
               {statuses.map((status) => (
                 <button
                   key={status}
                   className={cn(
-                    "px-3 py-1.5 text-sm font-medium rounded-md transition-colors capitalize",
+                    "px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors capitalize whitespace-nowrap",
                     selectedStatus === status
                       ? "bg-background text-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
@@ -283,17 +290,14 @@ export default function AdminCandidatesPage() {
                 </button>
               ))}
             </div>
-            <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
-              <Filter className="h-4 w-4 mr-2" />
-              Filters
-            </Button>
-          </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </div>
 
         {/* Advanced Filters */}
         {showFilters && (
-          <div className="px-4 pb-4 border-t border-border pt-4">
-            <div className="grid grid-cols-4 gap-4">
+          <div className="px-3 sm:px-4 pb-3 sm:pb-4 border-t border-border pt-3 sm:pt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Source</label>
                 <select className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-sm">
@@ -338,21 +342,21 @@ export default function AdminCandidatesPage() {
 
       {/* Bulk Actions */}
       {selectedCandidates.length > 0 && (
-        <div className="bg-primary/10 rounded-xl p-4 mb-6 flex items-center justify-between">
+        <div className="bg-primary/10 rounded-xl p-3 sm:p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <span className="text-sm font-medium text-foreground">
             {selectedCandidates.length} candidate(s) selected
           </span>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-              <Mail className="h-4 w-4 mr-2" />
-              Send Email
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <Mail className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden xs:inline">Send</span> Email
             </Button>
-            <Button variant="outline" size="sm">
-              <Calendar className="h-4 w-4 mr-2" />
-              Schedule Interview
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <Calendar className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden xs:inline">Schedule</span> Interview
             </Button>
-            <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
-              <Trash className="h-4 w-4 mr-2" />
+            <Button variant="outline" size="sm" className="text-destructive hover:text-destructive text-xs sm:text-sm">
+              <Trash className="h-4 w-4 mr-1 sm:mr-2" />
               Delete
             </Button>
           </div>
@@ -361,7 +365,8 @@ export default function AdminCandidatesPage() {
 
       {/* Candidates Table */}
       <div className="bg-card rounded-xl border border-border overflow-hidden">
-        <table className="w-full">
+        <ScrollArea className="w-full">
+          <table className="w-full min-w-[900px]">
           <thead className="bg-muted/50">
             <tr>
               <th className="text-left p-4 font-medium text-muted-foreground">
@@ -448,22 +453,24 @@ export default function AdminCandidatesPage() {
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
 
         {/* Pagination */}
-        <div className="p-4 border-t border-border flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
+        <div className="p-3 sm:p-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
             Showing {filteredCandidates.length} of {mockCandidates.length} candidates
           </p>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" disabled={currentPage === 1}>
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Previous
+            <Button variant="outline" size="sm" disabled={currentPage === 1} className="text-xs sm:text-sm">
+              <ChevronLeft className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Previous</span>
             </Button>
-            <span className="px-3 py-1 text-sm">Page {currentPage}</span>
-            <Button variant="outline" size="sm">
-              Next
-              <ChevronRight className="h-4 w-4 ml-1" />
+            <span className="px-2 sm:px-3 py-1 text-xs sm:text-sm">Page {currentPage}</span>
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+              <span className="hidden sm:inline">Next</span>
+              <ChevronRight className="h-4 w-4 sm:ml-1" />
             </Button>
           </div>
         </div>

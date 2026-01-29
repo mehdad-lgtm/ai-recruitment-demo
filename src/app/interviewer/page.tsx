@@ -125,27 +125,40 @@ export default function InterviewerDashboard() {
       {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Today's Sessions - Takes 2 columns */}
-        <div className="lg:col-span-2 bg-card rounded-xl border border-(--color-border) p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-foreground">Today&apos;s Sessions</h3>
+        <div className="lg:col-span-2 bg-card rounded-xl border border-(--color-border) p-4 sm:p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">Today&apos;s Sessions</h3>
             <Link href="/interviewer/sessions">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
                 View All
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </Link>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {todaysSessions.map((session, index) => (
               <div
                 key={session.id}
-                className="flex items-center gap-4 p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
               >
-                <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-6 w-6 text-primary" />
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <User className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0 sm:hidden">
+                    <p className="font-medium text-foreground text-sm">{session.candidateName}</p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {session.time}
+                      </span>
+                      <span>•</span>
+                      <span>{session.duration}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="hidden sm:block flex-1 min-w-0">
                   <p className="font-medium text-foreground">{session.candidateName}</p>
                   <div className="flex items-center gap-3 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
@@ -161,15 +174,15 @@ export default function InterviewerDashboard() {
                     </span>
                   </div>
                 </div>
-                <div className="shrink-0 flex gap-2">
+                <div className="flex gap-2 sm:shrink-0">
                   <Link href={`/interviewer/briefs/${session.id}`}>
-                    <Button variant="outline" size="sm">
-                      <FileText className="h-4 w-4 mr-1" />
-                      Brief
+                    <Button variant="outline" size="sm" className="text-xs sm:text-sm h-8">
+                      <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-1" />
+                      <span className="hidden sm:inline">Brief</span>
                     </Button>
                   </Link>
                   {index === 0 && (
-                    <Button size="sm">
+                    <Button size="sm" className="text-xs sm:text-sm h-8">
                       Join Now
                     </Button>
                   )}
@@ -191,36 +204,36 @@ export default function InterviewerDashboard() {
       </div>
 
       {/* Upcoming Week Preview */}
-      <div className="mt-8 bg-card rounded-xl border border-(--color-border) p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-foreground">This Week Overview</h3>
+      <div className="mt-6 sm:mt-8 bg-card rounded-xl border border-(--color-border) p-4 sm:p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+          <h3 className="text-base sm:text-lg font-semibold text-foreground">This Week Overview</h3>
           <Link href="/interviewer/availability">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="text-xs sm:text-sm">
               Manage Availability
             </Button>
           </Link>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-7">
+        <div className="grid grid-cols-7 gap-1 sm:gap-4">
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => {
             const count = [3, 4, 5, 2, 4, 0, 0][index];
             const isToday = index === 0;
             return (
               <div
                 key={day}
-                className={`text-center p-4 rounded-lg ${
+                className={`text-center p-2 sm:p-4 rounded-lg ${
                   isToday
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted/30"
                 }`}
               >
-                <p className={`text-sm font-medium ${isToday ? "text-primary-foreground" : "text-muted-foreground"}`}>
+                <p className={`text-[10px] sm:text-sm font-medium ${isToday ? "text-primary-foreground" : "text-muted-foreground"}`}>
                   {day}
                 </p>
-                <p className={`text-2xl font-bold mt-1 ${isToday ? "text-primary-foreground" : "text-foreground"}`}>
+                <p className={`text-lg sm:text-2xl font-bold mt-0.5 sm:mt-1 ${isToday ? "text-primary-foreground" : "text-foreground"}`}>
                   {count}
                 </p>
-                <p className={`text-xs mt-1 ${isToday ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                <p className={`text-[8px] sm:text-xs mt-0.5 sm:mt-1 hidden sm:block ${isToday ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                   {count === 1 ? "interview" : "interviews"}
                 </p>
               </div>
