@@ -1,23 +1,20 @@
 "use client";
 
+import { CalendarContainer } from "@/components/calendar/calendar-container";
 import { CalendarProvider } from "@/components/calendar/calendar-context";
-import { CalendarWeekView } from "@/components/calendar/calendar-week-view";
 import type { ICalendarEvent, ICalendarUser } from "@/components/calendar/types";
 import { ProtectedDashboard } from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { addDays, addWeeks, format, startOfWeek, subWeeks } from "date-fns";
+import { addDays, addWeeks, format } from "date-fns";
 import {
-    Calendar,
-    Check,
-    ChevronLeft,
-    ChevronRight,
-    Clock,
-    Copy,
-    Plus,
-    Save,
-    Settings,
-    X
+  Calendar,
+  Check,
+  Clock,
+  Copy,
+  Save,
+  Settings,
+  X
 } from "lucide-react";
 import { useState } from "react";
 
@@ -109,12 +106,8 @@ function AvailabilityContent() {
   const [view, setView] = useState<"calendar" | "settings">("calendar");
   const [workingHours, setWorkingHours] = useState(defaultWorkingHours);
   const [hasChanges, setHasChanges] = useState(false);
-  const [selectedWeek, setSelectedWeek] = useState(new Date());
   const [availabilitySlots, setAvailabilitySlots] = useState(mockAvailabilitySlots);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
-
-  const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
-  const weekEnd = addDays(weekStart, 6);
 
   const handleWorkingHoursChange = (day: string, field: "enabled" | "start" | "end", value: boolean | string) => {
     setWorkingHours((prev) => ({
@@ -188,45 +181,12 @@ function AvailabilityContent() {
 
       {view === "calendar" ? (
         <div className="space-y-6">
-          {/* Calendar Header */}
-          <div className="flex items-center justify-between bg-card rounded-xl border border-border p-4">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setSelectedWeek(subWeeks(selectedWeek, 1))}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setSelectedWeek(addWeeks(selectedWeek, 1))}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <h2 className="text-lg font-semibold text-foreground ml-2">
-                {format(weekStart, "MMM d")} - {format(weekEnd, "MMM d, yyyy")}
-              </h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedWeek(new Date())}
-                className="ml-2"
-              >
-                Today
-              </Button>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={handleCopyToNextWeek}>
-                <Copy className="h-4 w-4 mr-2" />
-                Copy to Next Week
-              </Button>
-              <Button onClick={() => setShowQuickAdd(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Availability
-              </Button>
-            </div>
+          {/* Quick Actions */}
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="outline" onClick={handleCopyToNextWeek}>
+              <Copy className="h-4 w-4 mr-2" />
+              Copy to Next Week
+            </Button>
           </div>
 
           {/* Legend */}
@@ -253,12 +213,15 @@ function AvailabilityContent() {
           <CalendarProvider
             initialEvents={allEvents}
             initialUsers={[currentUser]}
+            initialView="week"
             initialWorkingHours={{ start: 8, end: 18 }}
             initialVisibleHours={{ start: 7, end: 19 }}
           >
-            <div className="bg-card rounded-xl border border-border overflow-hidden">
-              <CalendarWeekView />
-            </div>
+            <CalendarContainer 
+              showToolbar={true}
+              showUserFilter={false}
+              onAddEvent={() => setShowQuickAdd(true)}
+            />
           </CalendarProvider>
 
           {/* Quick Stats */}

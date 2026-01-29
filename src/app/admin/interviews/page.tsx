@@ -1,8 +1,7 @@
 "use client";
 
+import { CalendarContainer } from "@/components/calendar/calendar-container";
 import { CalendarProvider } from "@/components/calendar/calendar-context";
-import { CalendarMonthView } from "@/components/calendar/calendar-month-view";
-import { CalendarWeekView } from "@/components/calendar/calendar-week-view";
 import type { ICalendarEvent, ICalendarUser } from "@/components/calendar/types";
 import { ProtectedDashboard } from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
@@ -163,7 +162,6 @@ const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
 export default function AdminInterviewsPage() {
   const [view, setView] = useState<"calendar" | "list">("calendar");
-  const [calendarView, setCalendarView] = useState<"week" | "month">("week");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedInterviewer, setSelectedInterviewer] = useState("all");
@@ -296,54 +294,6 @@ export default function AdminInterviewsPage() {
       {view === "calendar" ? (
         /* Calendar View */
         <div className="space-y-4">
-          {/* Calendar Controls */}
-          <div className="flex items-center justify-between bg-card rounded-xl border border-border p-4">
-            <div className="flex items-center gap-4">
-              {/* Interviewer Filter */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Interviewer:</span>
-                <select
-                  className="px-3 py-1.5 bg-muted border border-border rounded-lg text-sm"
-                  value={selectedInterviewer}
-                  onChange={(e) => setSelectedInterviewer(e.target.value)}
-                >
-                  <option value="all">All Interviewers</option>
-                  {mockInterviewers.map((interviewer) => (
-                    <option key={interviewer.id} value={interviewer.id}>
-                      {interviewer.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center bg-muted rounded-lg p-1">
-                <button
-                  className={cn(
-                    "px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
-                    calendarView === "week"
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                  onClick={() => setCalendarView("week")}
-                >
-                  Week
-                </button>
-                <button
-                  className={cn(
-                    "px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
-                    calendarView === "month"
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                  onClick={() => setCalendarView("month")}
-                >
-                  Month
-                </button>
-              </div>
-            </div>
-          </div>
-
           {/* Interviewer Legend */}
           <div className="flex items-center gap-4 bg-card rounded-xl border border-border p-4">
             {mockInterviewers.map((interviewer) => (
@@ -366,12 +316,15 @@ export default function AdminInterviewsPage() {
           <CalendarProvider
             initialEvents={mockSessions}
             initialUsers={mockInterviewers}
+            initialView="week"
             initialWorkingHours={{ start: 8, end: 18 }}
             initialVisibleHours={{ start: 7, end: 19 }}
           >
-            <div className="bg-card rounded-xl border border-border overflow-hidden">
-              {calendarView === "week" ? <CalendarWeekView /> : <CalendarMonthView />}
-            </div>
+            <CalendarContainer 
+              showToolbar={true}
+              showUserFilter={true}
+              onAddEvent={() => setShowScheduleModal(true)}
+            />
           </CalendarProvider>
         </div>
       ) : (
