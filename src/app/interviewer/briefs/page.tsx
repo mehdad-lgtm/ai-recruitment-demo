@@ -3,9 +3,11 @@
 import { ProtectedDashboard } from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 import {
     Briefcase,
     Calendar,
+    ChevronLeft,
     ChevronRight,
     Clock,
     FileText,
@@ -100,6 +102,7 @@ const statusColors: Record<string, string> = {
 export default function BriefsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBrief, setSelectedBrief] = useState<string | null>(mockBriefs[0]?.id || null);
+  const [showDetail, setShowDetail] = useState(false);
 
   const filteredBriefs = mockBriefs.filter(
     (brief) =>
@@ -112,17 +115,17 @@ export default function BriefsPage() {
   return (
     <ProtectedDashboard allowedRoles={["admin", "interviewer"]}>
       {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Candidate Briefs</h1>
-        <p className="text-muted-foreground mt-1">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Candidate Briefs</h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">
           Review candidate information before your interviews.
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 h-full min-h-[600px]">
         {/* Brief List */}
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
-          <div className="p-4 border-b border-border">
+        <div className="bg-card rounded-xl border border-border overflow-hidden flex flex-col h-full">
+          <div className="p-3 sm:p-4 border-b border-border shrink-0">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
@@ -135,30 +138,36 @@ export default function BriefsPage() {
             </div>
           </div>
 
-          <div className="divide-y divide-border max-h-[600px] overflow-y-auto">
+          <div className="divide-y divide-border flex-1 overflow-y-auto">
             {filteredBriefs.map((brief) => (
               <button
                 key={brief.id}
                 className={cn(
-                  "w-full text-left p-4 hover:bg-muted/50 transition-colors",
+                  "w-full text-left p-3 sm:p-4 hover:bg-muted/50 transition-colors",
                   selectedBrief === brief.id && "bg-muted"
                 )}
-                onClick={() => setSelectedBrief(brief.id)}
+                onClick={() => {
+                  setSelectedBrief(brief.id);
+                  // Only show slide-in on mobile
+                  if (window.innerWidth < 1024) {
+                    setShowDetail(true);
+                  }
+                }}
               >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold shrink-0">
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-semibold text-sm sm:text-base shrink-0">
                     {brief.candidateName.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium text-foreground truncate">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-medium text-foreground truncate text-sm sm:text-base">
                         {brief.candidateName}
                       </p>
-                      <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium capitalize", statusColors[brief.status])}>
+                      <span className={cn("px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium capitalize shrink-0", statusColors[brief.status])}>
                         {brief.status}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground truncate">
+                    <p className="text-xs sm:text-sm text-muted-foreground truncate">
                       {brief.position}
                     </p>
                     <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
@@ -173,7 +182,7 @@ export default function BriefsPage() {
             ))}
 
             {filteredBriefs.length === 0 && (
-              <div className="text-center py-12">
+              <div className="text-center py-8 sm:py-12">
                 <FileText className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
                 <p className="text-sm text-muted-foreground">No briefs found</p>
               </div>
@@ -181,81 +190,231 @@ export default function BriefsPage() {
           </div>
         </div>
 
-        {/* Brief Detail */}
-        <div className="col-span-2">
-          {currentBrief ? (
-            <div className="bg-card rounded-xl border border-border overflow-hidden">
-              {/* Header */}
-              <div className="p-6 border-b border-border bg-muted/30">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary text-2xl font-semibold">
+        {/* Animated Brief Detail - Mobile Only */}
+        <AnimatePresence>
+          {showDetail && currentBrief && (
+            <motion.div
+              initial={{ x: "100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "100%", opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed inset-0 z-50 bg-background lg:hidden"
+            >
+              <div className="bg-card rounded-xl border border-border overflow-hidden w-full h-full flex flex-col">
+                {/* Header with back button */}
+                <div className="p-4 sm:p-6 border-b border-border bg-muted/30 shrink-0">
+                  <div className="flex items-center gap-3 mb-4">
+                    <button
+                      onClick={() => setShowDetail(false)}
+                      className="p-2 hover:bg-muted rounded-lg transition-colors"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <h2 className="text-lg font-semibold text-foreground">Candidate Details</h2>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary text-xl sm:text-2xl font-semibold shrink-0">
                       {currentBrief.candidateName.charAt(0)}
                     </div>
-                    <div>
-                      <h2 className="text-xl font-semibold text-foreground">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-lg sm:text-xl font-semibold text-foreground truncate">
                         {currentBrief.candidateName}
-                      </h2>
-                      <p className="text-muted-foreground">{currentBrief.position}</p>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                      </h3>
+                      <p className="text-sm sm:text-base text-muted-foreground truncate">{currentBrief.position}</p>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
+                          <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           {currentBrief.interviewDate.toLocaleDateString()}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
+                          <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           {currentBrief.interviewTime}
                         </span>
                       </div>
                     </div>
                   </div>
-                  <span className={cn("px-3 py-1 rounded-full text-sm font-medium capitalize", statusColors[currentBrief.status])}>
+                  <div className="mt-3">
+                    <span className={cn("px-3 py-1 rounded-full text-sm font-medium capitalize", statusColors[currentBrief.status])}>
+                      {currentBrief.status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
+                  {/* Contact & Basic Info */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-3">Contact Information</h3>
+                      <div className="space-y-1.5 sm:space-y-2">
+                        <div className="flex items-center gap-2 text-xs sm:text-sm">
+                          <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                          <span className="text-foreground truncate">{currentBrief.phone}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs sm:text-sm">
+                          <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                          <span className="text-foreground truncate">{currentBrief.email}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs sm:text-sm">
+                          <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                          <span className="text-foreground">{currentBrief.language}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs sm:text-sm">
+                          <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                          <span className="text-foreground">{currentBrief.location}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-3">Professional Info</h3>
+                      <div className="space-y-1.5 sm:space-y-2">
+                        <div className="flex items-center gap-2 text-xs sm:text-sm">
+                          <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                          <span className="text-foreground truncate">{currentBrief.currentStatus}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs sm:text-sm">
+                          <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                          <span className="text-foreground">{currentBrief.experience} experience</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs sm:text-sm">
+                          <span className="text-muted-foreground">Expected:</span>
+                          <span className="text-foreground truncate">{currentBrief.expectedSalary}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs sm:text-sm">
+                          <span className="text-muted-foreground">Availability:</span>
+                          <span className="text-foreground">{currentBrief.availability}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Source */}
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-1.5 sm:mb-2">Source</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{currentBrief.source}</p>
+                  </div>
+
+                  {/* Notes */}
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-1.5 sm:mb-2">AI-Generated Summary</h3>
+                    <p className="text-xs sm:text-sm text-foreground bg-muted/50 p-3 sm:p-4 rounded-lg">
+                      {currentBrief.notes}
+                    </p>
+                  </div>
+
+                  {/* Chat Insights */}
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-1.5 sm:mb-2 flex items-center gap-2">
+                      <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      Key Insights from Chat
+                    </h3>
+                    <ul className="space-y-1.5 sm:space-y-2">
+                      {currentBrief.chatInsights.map((insight, index) => (
+                        <li key={index} className="flex items-start gap-2 text-xs sm:text-sm">
+                          <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0 mt-0.5" />
+                          <span className="text-foreground">{insight}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="p-4 sm:p-6 border-t border-border bg-muted/30 shrink-0">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <Button className="flex-1 text-xs sm:text-sm">
+                      Start Interview
+                    </Button>
+                    <Button variant="outline" className="text-xs sm:text-sm">
+                      <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-1" />
+                      <span className="hidden sm:inline">Call</span>
+                    </Button>
+                    <Button variant="outline" className="text-xs sm:text-sm">
+                      <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-1" />
+                      <span className="hidden sm:inline">Message</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Desktop Detail View */}
+        <div className="hidden lg:block lg:col-span-2 h-full">
+          {currentBrief ? (
+            <div className="bg-card rounded-xl border border-border overflow-hidden w-full flex flex-col h-full">
+              {/* Header */}
+              <div className="p-4 sm:p-6 border-b border-border bg-muted/30 shrink-0">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary text-xl sm:text-2xl font-semibold shrink-0">
+                      {currentBrief.candidateName.charAt(0)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h2 className="text-lg sm:text-xl font-semibold text-foreground truncate">
+                        {currentBrief.candidateName}
+                      </h2>
+                      <p className="text-sm sm:text-base text-muted-foreground truncate">{currentBrief.position}</p>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          {currentBrief.interviewDate.toLocaleDateString()}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          {currentBrief.interviewTime}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <span className={cn("px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium capitalize shrink-0", statusColors[currentBrief.status])}>
                     {currentBrief.status}
                   </span>
                 </div>
               </div>
 
               {/* Content */}
-              <div className="p-6 space-y-6">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
                 {/* Contact & Basic Info */}
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <h3 className="text-sm font-semibold text-foreground mb-3">Contact Information</h3>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Phone className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-foreground">{currentBrief.phone}</span>
+                    <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-3">Contact Information</h3>
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm">
+                        <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                        <span className="text-foreground truncate">{currentBrief.phone}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-foreground">{currentBrief.email}</span>
+                      <div className="flex items-center gap-2 text-xs sm:text-sm">
+                        <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                        <span className="text-foreground truncate">{currentBrief.email}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Globe className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex items-center gap-2 text-xs sm:text-sm">
+                        <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
                         <span className="text-foreground">{currentBrief.language}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex items-center gap-2 text-xs sm:text-sm">
+                        <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
                         <span className="text-foreground">{currentBrief.location}</span>
                       </div>
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-foreground mb-3">Professional Info</h3>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Briefcase className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-foreground">{currentBrief.currentStatus}</span>
+                    <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-3">Professional Info</h3>
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm">
+                        <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                        <span className="text-foreground truncate">{currentBrief.currentStatus}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex items-center gap-2 text-xs sm:text-sm">
+                        <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
                         <span className="text-foreground">{currentBrief.experience} experience</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm">
                         <span className="text-muted-foreground">Expected:</span>
-                        <span className="text-foreground">{currentBrief.expectedSalary}</span>
+                        <span className="text-foreground truncate">{currentBrief.expectedSalary}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm">
                         <span className="text-muted-foreground">Availability:</span>
                         <span className="text-foreground">{currentBrief.availability}</span>
                       </div>
@@ -265,28 +424,28 @@ export default function BriefsPage() {
 
                 {/* Source */}
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground mb-2">Source</h3>
-                  <p className="text-sm text-muted-foreground">{currentBrief.source}</p>
+                  <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-1.5 sm:mb-2">Source</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{currentBrief.source}</p>
                 </div>
 
                 {/* Notes */}
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground mb-2">AI-Generated Summary</h3>
-                  <p className="text-sm text-foreground bg-muted/50 p-4 rounded-lg">
+                  <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-1.5 sm:mb-2">AI-Generated Summary</h3>
+                  <p className="text-xs sm:text-sm text-foreground bg-muted/50 p-3 sm:p-4 rounded-lg">
                     {currentBrief.notes}
                   </p>
                 </div>
 
                 {/* Chat Insights */}
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
+                  <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-1.5 sm:mb-2 flex items-center gap-2">
+                    <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     Key Insights from Chat
                   </h3>
-                  <ul className="space-y-2">
+                  <ul className="space-y-1.5 sm:space-y-2">
                     {currentBrief.chatInsights.map((insight, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
-                        <ChevronRight className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                      <li key={index} className="flex items-start gap-2 text-xs sm:text-sm">
+                        <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0 mt-0.5" />
                         <span className="text-foreground">{insight}</span>
                       </li>
                     ))}
@@ -295,18 +454,18 @@ export default function BriefsPage() {
               </div>
 
               {/* Actions */}
-              <div className="p-6 border-t border-border bg-muted/30">
-                <div className="flex gap-2">
-                  <Button className="flex-1">
+              <div className="p-4 sm:p-6 border-t border-border bg-muted/30 shrink-0">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                  <Button className="flex-1 text-xs sm:text-sm">
                     Start Interview
                   </Button>
-                  <Button variant="outline">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Call
+                  <Button variant="outline" className="text-xs sm:text-sm">
+                    <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Call</span>
                   </Button>
-                  <Button variant="outline">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Message
+                  <Button variant="outline" className="text-xs sm:text-sm">
+                    <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Message</span>
                   </Button>
                 </div>
               </div>
@@ -315,7 +474,7 @@ export default function BriefsPage() {
             <div className="bg-card rounded-xl border border-border h-full flex items-center justify-center min-h-[400px]">
               <div className="text-center">
                 <FileText className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
-                <p className="text-muted-foreground">Select a candidate to view their brief</p>
+                <p className="text-sm text-muted-foreground">Select a candidate to view their brief</p>
               </div>
             </div>
           )}
